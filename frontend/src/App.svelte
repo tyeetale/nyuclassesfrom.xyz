@@ -5,7 +5,7 @@
  
   <h1>nyuclassesfrom.xyz</h1>
 
-  <p>try words, phrases, titles, subjects, schools, course numbers, instructor names, instructor mode, grading, components, and more. 
+  <p class="w-2">try words, phrases, titles, subjects, schools, course numbers, instructor names, instructor mode, grading, components, and more. 
     You can also look for exact phrases and prefix matches.</p>
  
 
@@ -14,6 +14,3 @@
   </p>
 </main>
 
-<style>
-  
-</style>
