@@ -9,4 +9,8 @@ Furthermore, NYU's status as a global campus with over 40+ locations globally ma
 
 Different schools, different classes, and different timezones all blend together to be a slow process.
 
-As such, this project is an attempt to gather fast results for course search, as inspired from classes.wtf, coded in svelte, go, and redis.
+As such, this project is an attempt to gather fast results for course search, as inspired from classes.wtf, coded in svelte, rust, and redis.
+
+We want to provide a service that will help students easily select and find classes with the given structure at NYU.
+
+
