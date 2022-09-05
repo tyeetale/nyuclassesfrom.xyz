@@ -16,7 +16,7 @@ import SearchBar from "./lib/SearchBar.svelte";
  
   <!-- Footer -->
    <p>
-    made with ❤ by <a href="https://github.com/tyeetale" target="_blank">tyeetale</a> & <a href="https://github.com/sveltejs/kit#readme" target="_blank">sheldon</a> using 
+    made with ❤ by <a href="https://github.com/tyeetale" target="_blank">tyeetale</a> & <a href="https://github.com/nh8157" target="_blank">sheldon</a> using 
   </p>
 </main>
 
