@@ -13,8 +13,8 @@
   "section": 1,
   "grading": "Ugrd Shanghai Graded",
   "course_location": "Shanghai",
-  "session_start": 44817,
-  "session_end": 44911,
+  "session_start": "2022-09-13",
+  "session_end": "2022-12-16",
   "class_status": "Open",
   "instruction_mode": "In-Person",
   "component": "Seminar",
@@ -25,13 +25,13 @@
   "meet_friday": false,
   "meet_saturday": false,
   "meet_sunday": false,
-  "start_time (24hr)": 0.34375,
-  "end_time (24hr)": 0.3958333333,
+  "start_time (24hr)": "12:00",
+  "end_time (24hr)": "13:00",
   "timezone (GMT)": "\"+8\"",
   "instructor": "Firas Alzain",
   "description": "This course is designed for learners with no prior knowledge of Arabic. Students who have studied Arabic before or who have prior knowledge of Arabic are required to take a placement test. This is a full semester (or equivalent session) course during which students first learn the Arabic alphabet, then move on to work on the sentence and paragraph levels. It is an interactive course designed to build the student’s abilities in listening, speaking, reading, and writing. At the end of the semester students should be able to carry on a short conversation; ask and answer questions; introduce themselves and others; provide simple biographical information; interact in simple daily life situations; ask for assistance; express likes and dislikes; read short texts; and gain a basic understanding of Arab culture. Types of tasks and assignments required for this course include daily homework assignments, periodic quizzes, brief presentations, short essay writing, and a final exam.",
   "prerequisites": "None",
-  "fulfillment": "General Elective"
+  "fulfillment": "General Eletive"
  },
  {
   "school_name": "NYU Shanghai",
