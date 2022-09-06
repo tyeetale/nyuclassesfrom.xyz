@@ -13,4 +13,12 @@ As such, this project is an attempt to gather fast results for course search, as
 
 We want to provide a service that will help students easily select and find classes with the given structure at NYU.
 
+## Data Fetching
 
+- catch all the school codes and subject codes
+  - ex: SHU = shanghai CSCI = computer science
+- go through and fetch each course based off subject & school
+  - https://schedge.a1liu.com/2022/fa/SHU/CSCI
+- search for course based on full=true, query=courseName, school, subject
+  https://schedge.a1liu.com/2022/fa/search?full=true&query={courseName}&school={schoolCode}&subject={subjectCode}
+- stich and format the json
