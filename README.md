@@ -21,4 +21,6 @@ We want to provide a service that will help students easily select and find clas
   - https://schedge.a1liu.com/2022/fa/SHU/CSCI
 - search for course based on full=true, query=courseName, school, subject
   https://schedge.a1liu.com/2022/fa/search?full=true&query={courseName}&school={schoolCode}&subject={subjectCode}
-- stich and format the json
+- stitch and format the json
+
+- school codes (fetch) + subject codes (fetch) => list of combos (SHU/CSCI) => courses (fetch) => list of name, courseId, school, subject => search (fetches) => final list of everything per each course
