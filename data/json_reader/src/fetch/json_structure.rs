@@ -10,7 +10,7 @@ pub struct SubjectName {
 pub struct CourseInfoFull {
     pub name: String,
     pub deptCourseId: String,
-    pub description: String,
+    pub description: Option<String>,
     pub subjectCode: SubjectCode,
     pub sections: Vec<SectionFull>,
 }
@@ -56,7 +56,7 @@ pub struct SectionFull {
     pub status: String,
     pub meetings: Option<Vec<Meeting>>,
     pub receitations: Option<Vec<SectionFull>>,
-    pub waitlistTotal: u32,
+    pub waitlistTotal: Option<u32>,
     pub instructionMode: Option<String>,
     pub name: String,
     pub campus: String,

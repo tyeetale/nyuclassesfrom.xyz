@@ -72,11 +72,39 @@ pub async fn fetch_course_catalog(
 
 #[allow(dead_code)]
 pub async fn fetch_course_details(catalog: &Vec<(String, String, String)>) -> Result<Vec<CourseInfoFull>, Error> {
-    let course_info_list = Vec::new();
+    let mut course_info_list = Vec::new();
     let mut fetch_handles = Vec::new();
+    let mut parse_handles = Vec::new();
     for (course, school, subject) in catalog {
         let url = UrlBuilder::build_search_endpoint_url(course, school, subject)?;
-        fetch_handles.push(reqwest::get(url));
+        fetch_handles.push(tokio::spawn(reqwest::get(url)));
+    }
+
+    let fetch_len = fetch_handles.len();
+    for (i, jh) in fetch_handles.into_iter().enumerate() {
+        match jh.await {
+            Ok(Ok(res)) => {
+                println!("Response retrieved: {}/{}", i, fetch_len);
+                parse_handles.push(tokio::spawn(res.json::<Vec<CourseInfoFull>>()));
+            }
+            Ok(Err(_)) => return Err(Error::FetchContentFailed),
+            Err(_) => return Err(Error::JoinTaskFailed),
+        }
+    }
+
+    let parse_len = parse_handles.len();
+    for (i, jh) in parse_handles.into_iter().enumerate() {
+        match jh.await {
+            Ok(Ok(res)) => {
+                println!("JSON parsed: {}/{}", i, parse_len);
+                course_info_list.extend(res);
+            },
+            Ok(Err(error)) => {
+                println!("{:?}", error);
+                return Err(Error::ParseContentFailed);
+            },
+            _ => return Err(Error::JoinTaskFailed),
+        }
     }
 
     Ok(course_info_list)
