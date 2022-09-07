@@ -3,5 +3,6 @@
 pub enum Error {
     BuildUrlFailed(String),
     FetchContentFailed,
-    DecodeContentFailed,
+    ParseContentFailed,
+    JoinTaskFailed,
 }

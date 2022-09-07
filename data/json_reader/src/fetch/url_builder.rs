@@ -26,7 +26,7 @@ impl UrlBuilder {
             _ => Err(Error::BuildUrlFailed(url)),
         }
     }
-    pub fn _build_search_endpoint_url(course: String, school: String, subject: String) -> Result<Url, Error> {
+    pub fn build_search_endpoint_url(course: &String, school: &String, subject: &String) -> Result<Url, Error> {
         let url = format!(
             "https://schedge.a1liu.com/2022/fa/search?full=true&query={course}&school={school}&subject={subject}",
             course=course,
