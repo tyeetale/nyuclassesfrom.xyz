@@ -2,10 +2,9 @@ mod fetch;
 use std::{fs::File};
 use std::io::{Write, BufReader, BufRead};
 
-use fetch::json_structure::Meeting;
-
 use crate::fetch::fetch::{fetch_subjects, fetch_course_catalog, fetch_course_details};
 use crate::fetch::util::*;
+use crate::fetch::json_structure::*;
 
 fn read_and_process_catalog(path: &str, line_number: u32) -> Vec<(String, String, String)> {
     let file = File::open(path).unwrap();
@@ -38,36 +37,20 @@ async fn fetch_courses_save_as_json(line_number: u32) {
 
 #[tokio::main]
 async fn main() {
-    let meetings = Some(vec![
-        Meeting {
-            beginDate: String::from("2022-08-29 09:55:00"),
-            minutesDuration: 75,
-            endDate: String::from("2022-12-13 23:59:00"),
-        },
-        Meeting {
-            beginDate: String::from("2022-08-31 09:55:00"),
-            minutesDuration: 75,
-            endDate: String::from("2022-12-13 23:59:00"),
+    let file = File::open("./course_info.txt").unwrap();
+    let mut output = File::create("./course_flat.json").unwrap();
+    let reader = BufReader::new(file);
+    let year = 2022;
+    let term = String::from("Fall");
+    let school_name = String::from("NYU Shanghai");
+    let subject_name = String::from("Bussiness and Finance");
+    for line in reader.lines() {
+        if let Ok(content) = line {
+            let json: NestedCourseInfoFull = serde_json::from_str(&*content).unwrap();
+            let res = json.flatten(year, &term, &school_name, &subject_name).unwrap();
+            for info in res.iter() {
+                write!(output, "{}\n", serde_json::to_string(info).unwrap()).unwrap();
+            }
         }
-    ]);
-    let schedule = get_naive_schedule(meetings.as_ref());
-    
-    println!("{:?}", schedule[0].0.time());
-    // fetch_courses_save_as_json(100).await;
-    // if let Ok(school_subject_catalog) = fetch_subjects().await {
-    //     let catalog = fetch_course_catalog(2022, &String::from("fa"), &school_subject_catalog).await.unwrap();
-    //     let mut file = File::create("./course_catalog.txt").unwrap();
-    //     for c in catalog {
-    //         write!(&mut file, "{}\t{}\t{}\n", c.0, c.1, c.2).unwrap();
-    //     }
-    // }
-    // let file = File::open("./course_catalog.txt").unwrap();
-    // let reader = BufReader::new(file);
-    // let catalog = vec!((
-    //     String::from("Intermediate Korean II"),
-    //     String::from("UA"),
-    //     String::from("EAST")
-    // ));
-    // let res = fetch_course_details(&catalog).await.unwrap();
-    // println!("{:?}", res);
+    }
 }

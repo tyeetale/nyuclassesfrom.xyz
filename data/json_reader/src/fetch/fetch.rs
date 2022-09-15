@@ -3,7 +3,7 @@ use tokio;
 
 use crate::fetch::json_structure::{NestedCourseInfoFull, NestedCourseInfoSimple, SubjectName};
 use crate::fetch::types::Error;
-use crate::fetch::url_builder::UrlBuilder;
+use crate::fetch::util::UrlBuilder;
 
 pub async fn fetch_subjects() -> Result<HashMap<String, HashMap<String, SubjectName>>, Error> {
     // first step, fetch the course and school info

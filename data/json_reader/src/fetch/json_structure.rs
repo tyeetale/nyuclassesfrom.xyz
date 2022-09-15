@@ -12,7 +12,7 @@ pub struct FlatCourseInfo {
     pub subject_number: String,
     pub class_name: String,
     pub term: String,
-    pub year: u8,
+    pub year: u32,
     pub units: f32,
     pub class_number: u32,
     pub section: String,
@@ -59,9 +59,9 @@ pub struct NestedCourseInfoFull {
 }
 
 impl NestedCourseInfoFull {
-    fn flatten(
+    pub fn flatten(
         self,
-        year: u8,
+        year: u32,
         term: &String,
         school_name: &String,
         subject_name: &String,
@@ -89,7 +89,7 @@ impl NestedCourseInfoFull {
             let meeting_days = get_meeting_days(&schedule);
             let (start_time, end_time) = {
                 if schedule.len() > 0 {
-                    (schedule[0].0.time().to_string(), schedule[1].1.time().to_string());
+                    (schedule[0].0.time().to_string(), schedule[0].1.time().to_string());
                 }
                 (String::from("Time unavailable"), String::from("Time unavailable"))
             };
