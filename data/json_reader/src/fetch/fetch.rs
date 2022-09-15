@@ -1,11 +1,9 @@
 use std::collections::HashMap;
 use tokio;
 
-use crate::fetch::json_structure::{CourseInfoSimple, SubjectName};
+use crate::fetch::json_structure::{NestedCourseInfoFull, NestedCourseInfoSimple, SubjectName};
 use crate::fetch::types::Error;
 use crate::fetch::url_builder::UrlBuilder;
-
-use super::json_structure::CourseInfoFull;
 
 pub async fn fetch_subjects() -> Result<HashMap<String, HashMap<String, SubjectName>>, Error> {
     // first step, fetch the course and school info
@@ -48,7 +46,7 @@ pub async fn fetch_course_catalog(
         match jh.await {
             Ok(Ok(res)) => {
                 println!("Response retrieved: {}/{}", i + 1, fetch_len);
-                parse_handles.push(tokio::spawn(res.json::<Vec<CourseInfoSimple>>()));
+                parse_handles.push(tokio::spawn(res.json::<Vec<NestedCourseInfoSimple>>()));
             }
             Ok(Err(_)) => return Err(Error::FetchContentFailed),
             _ => return Err(Error::JoinTaskFailed),
@@ -70,8 +68,9 @@ pub async fn fetch_course_catalog(
     Ok(catalog)
 }
 
-#[allow(dead_code)]
-pub async fn fetch_course_details(catalog: &Vec<(String, String, String)>) -> Result<Vec<CourseInfoFull>, Error> {
+// we can reduce the block rate of requests by writing a dynamic window for
+// sending requests
+pub async fn fetch_course_details(catalog: &Vec<(String, String, String)>) -> Result<Vec<NestedCourseInfoFull>, Error> {
     let mut course_info_list = Vec::new();
     let mut fetch_handles = Vec::new();
     let mut parse_handles = Vec::new();
@@ -85,7 +84,7 @@ pub async fn fetch_course_details(catalog: &Vec<(String, String, String)>) -> Re
         match jh.await {
             Ok(Ok(res)) => {
                 println!("Response retrieved: {}/{}", i, fetch_len);
-                parse_handles.push(tokio::spawn(res.json::<Vec<CourseInfoFull>>()));
+                parse_handles.push(tokio::spawn(res.json::<Vec<NestedCourseInfoFull>>()));
             }
             Ok(Err(_)) => return Err(Error::FetchContentFailed),
             Err(_) => return Err(Error::JoinTaskFailed),

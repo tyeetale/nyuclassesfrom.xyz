@@ -2,9 +2,10 @@ mod fetch;
 use std::{fs::File};
 use std::io::{Write, BufReader, BufRead};
 
-use futures::FutureExt;
+use fetch::json_structure::Meeting;
 
 use crate::fetch::fetch::{fetch_subjects, fetch_course_catalog, fetch_course_details};
+use crate::fetch::util::*;
 
 fn read_and_process_catalog(path: &str, line_number: u32) -> Vec<(String, String, String)> {
     let file = File::open(path).unwrap();
@@ -23,7 +24,7 @@ fn read_and_process_catalog(path: &str, line_number: u32) -> Vec<(String, String
     res
 }
 
-async fn fetch_and_save_courses_json(line_number: u32) {
+async fn fetch_courses_save_as_json(line_number: u32) {
     let catalog = read_and_process_catalog("./course_catalog.txt", line_number);
     let mut file = File::create("./course_info.txt").unwrap();
     
@@ -35,14 +36,24 @@ async fn fetch_and_save_courses_json(line_number: u32) {
     }
 }
 
-fn read_json_from_disk(path: &str) {
-    
-}
-
 #[tokio::main]
 async fn main() {
-
-    fetch_and_save_courses_json(30).await;
+    let meetings = Some(vec![
+        Meeting {
+            beginDate: String::from("2022-08-29 09:55:00"),
+            minutesDuration: 75,
+            endDate: String::from("2022-12-13 23:59:00"),
+        },
+        Meeting {
+            beginDate: String::from("2022-08-31 09:55:00"),
+            minutesDuration: 75,
+            endDate: String::from("2022-12-13 23:59:00"),
+        }
+    ]);
+    let schedule = get_naive_schedule(meetings.as_ref());
+    
+    println!("{:?}", schedule[0].0.time());
+    // fetch_courses_save_as_json(100).await;
     // if let Ok(school_subject_catalog) = fetch_subjects().await {
     //     let catalog = fetch_course_catalog(2022, &String::from("fa"), &school_subject_catalog).await.unwrap();
     //     let mut file = File::create("./course_catalog.txt").unwrap();
