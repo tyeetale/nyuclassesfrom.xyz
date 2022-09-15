@@ -1,14 +1,19 @@
 use crate::fetch::json_structure::*;
-use crate::fetch::types::Location;
 use chrono::prelude::*;
 use chrono::Duration;
-use chrono_tz::*;
 use reqwest::Url;
 use crate::fetch::types::Error;
 
 pub struct UrlBuilder {}
 
 impl UrlBuilder {
+    pub fn build_schools_endpoint_url() -> Result<Url, Error> {
+        let url = "https://schedge.a1liu.com/schools";
+        match Url::parse(url) {
+            Ok(res) => Ok(res),
+            _ => Err(Error::BuildUrlFailed(String::from(url))),
+        }
+    }
     pub fn build_subjects_endpoint_url() -> Result<Url, Error> {
         let url = "https://schedge.a1liu.com/subjects";
         match Url::parse(
@@ -97,21 +102,3 @@ pub fn get_start_end_date(schedule: Option<&Vec<Meeting>>) -> (String, String) {
     }
     (String::from("Date unavailabe"), String::from("Date unavailable"))
 }
-
-fn convert_local_time_to_utc(location: &Location, local_datetime: &NaiveDateTime) -> DateTime<Utc> {
-    match location {
-        Location::Shanghai => Asia::Shanghai
-            .from_local_datetime(local_datetime)
-            .unwrap()
-            .with_timezone(&Utc),
-        Location::NewYork => America::New_York
-            .from_local_datetime(local_datetime)
-            .unwrap()
-            .with_timezone(&Utc),
-        Location::AbuDhabi => Asia::Dubai
-            .from_local_datetime(local_datetime)
-            .unwrap()
-            .with_timezone(&Utc),
-    }
-}
-

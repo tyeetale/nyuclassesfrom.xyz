@@ -2,6 +2,8 @@ mod fetch;
 use std::{fs::File};
 use std::io::{Write, BufReader, BufRead};
 
+use fetch::fetch::fetch_schools;
+
 use crate::fetch::fetch::{fetch_subjects, fetch_course_catalog, fetch_course_details};
 use crate::fetch::util::*;
 use crate::fetch::json_structure::*;

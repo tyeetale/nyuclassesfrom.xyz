@@ -1,18 +1,35 @@
 use std::collections::HashMap;
 use tokio;
 
-use crate::fetch::json_structure::{NestedCourseInfoFull, NestedCourseInfoSimple, SubjectName};
+use crate::fetch::json_structure::{NestedCourseInfoFull, NestedCourseInfoSimple, Name};
 use crate::fetch::types::Error;
 use crate::fetch::util::UrlBuilder;
 
-pub async fn fetch_subjects() -> Result<HashMap<String, HashMap<String, SubjectName>>, Error> {
+pub async fn fetch_subjects() -> Result<HashMap<String, HashMap<String, Name>>, Error> {
     // first step, fetch the course and school info
     let url = UrlBuilder::build_subjects_endpoint_url()?;
 
     match reqwest::get(url).await {
         Ok(res) => {
             match res
-                .json::<HashMap<String, HashMap<String, SubjectName>>>()
+                .json::<HashMap<String, HashMap<String, Name>>>()
+                .await
+            {
+                Ok(map) => return Ok(map),
+                Err(_) => return Err(Error::ParseContentFailed),
+            }
+        }
+        Err(_) => return Err(Error::FetchContentFailed),
+    };
+}
+
+pub async fn fetch_schools() -> Result<HashMap<String, Name>, Error> {
+    let url = UrlBuilder::build_schools_endpoint_url()?;
+
+    match reqwest::get(url).await {
+        Ok(res) => {
+            match res
+                .json::<HashMap<String, Name>>()
                 .await
             {
                 Ok(map) => return Ok(map),
@@ -26,7 +43,7 @@ pub async fn fetch_subjects() -> Result<HashMap<String, HashMap<String, SubjectN
 pub async fn fetch_course_catalog(
     year: u32,
     semester: &String,
-    school_subject_catalog: &HashMap<String, HashMap<String, SubjectName>>,
+    school_subject_catalog: &HashMap<String, HashMap<String, Name>>,
 ) -> Result<Vec<(String, String, String)>, Error> {
     // second step, iterate through all schools and their corresponding subjects
     // send get requests to the api

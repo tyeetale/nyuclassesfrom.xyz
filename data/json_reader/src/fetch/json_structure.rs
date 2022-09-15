@@ -1,4 +1,4 @@
-use crate::fetch::types::{Error, Location};
+use crate::fetch::types::{Error,};
 use crate::fetch::util::*;
 use serde::{Deserialize, Serialize};
 
@@ -44,7 +44,7 @@ pub struct FlatCourseInfo {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct SubjectName {
+pub struct Name {
     name: String,
 }
 
