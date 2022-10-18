@@ -1,25 +1,72 @@
+<script context="module">
+  export function encodeQueryHash(query) {
+    return "#" + encodeURIComponent(query).replaceAll("%20", "+");
+  }
+
+  export function decodeQueryHash(hash) {
+    return decodeURIComponent(hash.slice(1).replaceAll("+", "%20"));
+  }
+</script>
+
 <script>
-  let searchValue = "";
+  let query = location.hash ? decodeQueryHash(location.hash) : "";
+  $: {
+    const newUrl = query
+      ? encodeQueryHash(query)
+      : location.pathname + location.search;
+    history.replaceState(null, "", newUrl);
+  }
+
+  let landing = query === "";
+  $: if (query) landing = false;
+  let ay2023 = false;
+
+  // Render courses incrementally in batches of 20 at a time, to avoid slowing
+  // down the browser with too many elements at once.
+  let showing = 0;
+  let showingTimeout = 0;
 </script>
 
 <main>
-  <div class="flex h-screen">
+  <div class="flex h-screen bg-slate-50">
     <div class="m-auto">
       <h1
-        class="p-1 font-extrabold text-transparent text-6xl bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600"
+        class="text-center p-1 font-extrabold text-transparent text-6xl bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600"
       >
         nyuclassesfrom.xyz
       </h1>
-      <input class="mt-3" bind:value={searchValue} />
-      <p>Input: {searchValue}</p>
+      <div class="flex flex-nowrap items-center my-4 relative">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6 absolute z-10 ml-4"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+          />
+        </svg>
+
+        <input
+          class="searchbar w-full bg-inherit pl-12 hover:bg-gray-100 border-2 border-gray-200 py-4 px-8 rounded-full"
+          placeholder={landing ? "" : "Search…"}
+          bind:value={query}
+        />
+      </div>
+
       <p
-        class="p-1 text-transparent text-md bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600"
+        class="p-1  text-center text-transparent text-xl bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600"
       >
         try words, phrases, titles, subjects, schools, course numbers,
-        instructor names, grading, components, and more. You can also look for
-        exact phrases and prefix matches
+        <br /> instructor names, grading, components, and more. <br />You can
+        also look for exact phrases and prefix matches.
       </p>
-      <div class="flex items-center border-slate-200  dark:border-slate-800">
+
+      <div class="flex flex-nowrap justify-center mt-4">
         <!-- ADD: <ThemeToggle /> -->
         <a
           href="https://github.com/tyeetale/nyuclassesfrom.xyz"
@@ -28,7 +75,7 @@
           <span class="sr-only">nyuclassesfromxyz on GitHub</span>
           <svg
             viewBox="0 0 16 16"
-            class="w-5 h-5"
+            class="w-10 h-10"
             fill="currentColor"
             aria-hidden="true"
           >
@@ -43,53 +90,52 @@
 </main>
 
 <footer>
-  <p class="md:text-center md:mx-auto max-w-screen-sm" />
-  Made with ♥ by {" "}<a
-    href="https://github.com/tyeetale"
-    class="underline font-medium text-blue-500"
-    target="_blank noreferrer noopener">tyeetale</a
-  >
-  &
-  <a
-    href="https://github.com/nh8157"
-    class="underline font-medium text-blue-500"
-    target="_blank noreferrer noopener">sheldon chen</a
-  >
-  <div class="flex items-center">
-    using
-    <a href="https://www.rust-lang.org/"
-      ><img
-        src={"https://www.rust-lang.org/static/images/rust-logo-blk.svg"}
-        alt="Rust"
-        class="pb-1 pt-0.5 object-scale-down h-12 w-12"
-      /></a
-    >,<a href="https://svelte.dev"
-      ><img
-        src={"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Svelte_Logo.svg/1702px-Svelte_Logo.svg.png"}
-        alt="Svelte"
-        class="pb-1 pt-0.5 object-scale-down h-10 w-10"
-      /></a
-    >
-    >, indexed with
-    <a href="https://redis.io"
-      ><img
-        src={"https://download.logo.wine/logo/Redis/Redis-Logo.wine.png"}
-        alt="Redis"
-        class="pb-1 pt-1 object-scale-down h-20 w-20"
-      /></a
-    >, deployed to
-    <a href="https://vercel.com/"
-      ><img
-        src={"https://mms.businesswire.com/media/20211123005573/en/929867/23/vercel-logo-freelogovectors.net.jpg"}
-        alt="Vercel"
-        class="ml-2 pb-1 pt-0.5 object-scale-down h-20 w-20"
-      /></a
-    >
+  <div class="flex flex-nowrap">
+    <div class="mt-5 m-auto">
+      <p class="text-center">
+        Made with ♥ by {" "}<a
+          href="https://github.com/tyeetale"
+          class="underline font-medium text-blue-500"
+          target="_blank noreferrer noopener">tyeetale</a
+        >
+        &
+        <a
+          href="https://github.com/nh8157"
+          class="underline font-medium text-blue-500"
+          target="_blank noreferrer noopener">sheldon chen</a
+        >
+      </p>
+      <div class="flex items-center">
+        using
+        <a href="https://www.rust-lang.org/"
+          ><img
+            src={"https://www.rust-lang.org/static/images/rust-logo-blk.svg"}
+            alt="Rust"
+            class="pb-1 pt-0.5 object-scale-down h-12 w-12"
+          /></a
+        >,<a href="https://svelte.dev"
+          ><img
+            src={"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Svelte_Logo.svg/1702px-Svelte_Logo.svg.png"}
+            alt="Svelte"
+            class="pb-1 pt-0.5 object-scale-down h-10 w-10"
+          /></a
+        >
+        >, indexed with
+        <a href="https://redis.io"
+          ><img
+            src={"https://download.logo.wine/logo/Redis/Redis-Logo.wine.png"}
+            alt="Redis"
+            class="pb-1 pt-1 object-scale-down h-20 w-20"
+          /></a
+        >, deployed to
+        <a href="https://vercel.com/"
+          ><img
+            src={"https://mms.businesswire.com/media/20211123005573/en/929867/23/vercel-logo-freelogovectors.net.jpg"}
+            alt="Vercel"
+            class="ml-2 pb-1 pt-0.5 object-scale-down h-20 w-20"
+          /></a
+        >
+      </div>
+    </div>
   </div>
 </footer>
-
-<style>
-  :global(body) {
-    background-color: rgb(248 250 252);
-  }
-</style>
