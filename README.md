@@ -31,3 +31,9 @@ cd frontend
 npm install
 npm run dev
 ```
+
+# TODOs
+
+- [] Add Wrapping Formatting for frontend
+- [] Finish Scraping
+- [] Deploy Redis Server
