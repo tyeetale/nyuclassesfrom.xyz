@@ -89,53 +89,51 @@
   </div>
 </main>
 
-<footer>
-  <div class="flex flex-nowrap">
-    <div class="mt-5 m-auto">
-      <p class="text-center">
-        Made with ♥ by {" "}<a
-          href="https://github.com/tyeetale"
-          class="underline font-medium text-blue-500"
-          target="_blank noreferrer noopener">tyeetale</a
-        >
-        &
-        <a
-          href="https://github.com/nh8157"
-          class="underline font-medium text-blue-500"
-          target="_blank noreferrer noopener">sheldon chen</a
-        >
-      </p>
-      <div class="flex items-center">
-        using
-        <a href="https://www.rust-lang.org/"
-          ><img
-            src={"https://www.rust-lang.org/static/images/rust-logo-blk.svg"}
-            alt="Rust"
-            class="pb-1 pt-0.5 object-scale-down h-12 w-12"
-          /></a
-        >,<a href="https://svelte.dev"
-          ><img
-            src={"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Svelte_Logo.svg/1702px-Svelte_Logo.svg.png"}
-            alt="Svelte"
-            class="pb-1 pt-0.5 object-scale-down h-10 w-10"
-          /></a
-        >
-        >, indexed with
-        <a href="https://redis.io"
-          ><img
-            src={"https://download.logo.wine/logo/Redis/Redis-Logo.wine.png"}
-            alt="Redis"
-            class="pb-1 pt-1 object-scale-down h-20 w-20"
-          /></a
-        >, deployed to
-        <a href="https://vercel.com/"
-          ><img
-            src={"https://mms.businesswire.com/media/20211123005573/en/929867/23/vercel-logo-freelogovectors.net.jpg"}
-            alt="Vercel"
-            class="ml-2 pb-1 pt-0.5 object-scale-down h-20 w-20"
-          /></a
-        >
-      </div>
+<footer class="flex">
+  <div class="mt-10 m-auto">
+    <p class="text-center">
+      Made with ♥ by {" "}<a
+        href="https://github.com/tyeetale"
+        class="underline font-medium text-blue-500"
+        target="_blank noreferrer noopener">tyeetale</a
+      >
+      &
+      <a
+        href="https://github.com/nh8157"
+        class="underline font-medium text-blue-500"
+        target="_blank noreferrer noopener">sheldon chen</a
+      >
+    </p>
+    <div class="flex items-center">
+      using
+      <a href="https://www.rust-lang.org/"
+        ><img
+          src={"https://www.rust-lang.org/static/images/rust-logo-blk.svg"}
+          alt="Rust"
+          class="pb-1 pt-0.5 object-scale-down h-12 w-12"
+        /></a
+      >,<a href="https://svelte.dev"
+        ><img
+          src={"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Svelte_Logo.svg/1702px-Svelte_Logo.svg.png"}
+          alt="Svelte"
+          class="pb-1 pt-0.5 object-scale-down h-10 w-10"
+        /></a
+      >
+      >, indexed with
+      <a href="https://redis.io"
+        ><img
+          src={"https://download.logo.wine/logo/Redis/Redis-Logo.wine.png"}
+          alt="Redis"
+          class="pb-1 pt-1 object-scale-down h-20 w-20"
+        /></a
+      >, deployed to
+      <a href="https://vercel.com/"
+        ><img
+          src={"https://mms.businesswire.com/media/20211123005573/en/929867/23/vercel-logo-freelogovectors.net.jpg"}
+          alt="Vercel"
+          class="ml-2 pb-1 pt-0.5 object-scale-down h-20 w-20"
+        /></a
+      >
     </div>
   </div>
 </footer>
