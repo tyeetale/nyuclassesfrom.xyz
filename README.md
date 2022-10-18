@@ -27,6 +27,7 @@ With all this being said, it is our aspiration to help fellow NYU students easil
 # Running the Frontend
 
 ```
+cd frontend
 npm install
 npm run dev
 ```
