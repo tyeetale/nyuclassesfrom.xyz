@@ -23,3 +23,10 @@ With all this being said, it is our aspiration to help fellow NYU students easil
 - stitch and format the json
 
 - school codes (fetch) + subject codes (fetch) => list of combos (SHU/CSCI) => courses (fetch) => list of name, courseId, school, subject => search (fetches) => final list of everything per each course
+
+# Running the Frontend
+
+```
+npm install
+npm run dev
+```
