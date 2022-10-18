@@ -4,14 +4,13 @@ Make NYU course search fast.
 
 If we think Harvard's online catalog is slow... we don't even have a graphQL endpoint at NYU XD.
 
-All points aside, the network is huge, and it's very annoying to wait for a online catalog search.
-Furthermore, NYU's status as a global campus with over 40+ locations globally makes it more hard to manage from a catagorical point of view.
+All jokes aside, our course search is huge, and it's very annoying to wait for a online catalog search. Furthermore, NYU's status as a global campus with over 40+ locations globally makes it harder to manage from a catagorical point of view, compared to other course searches.Different schools, different classes, and different timezones all blend together, which is why the current website is a slow process (Not to mention highly cryptic and bundled weirdly).
 
-Different schools, different classes, and different timezones all blend together to be a slow process.
+As such, this project is an attempt to gather fast results for course search, as inspired from classes.wtf.
 
-As such, this project is an attempt to gather fast results for course search, as inspired from classes.wtf, coded in svelte, rust, and redis.
+Please keep in mind this is a hobby project between friends, and in no ways can we gaurantee that everything will be working 100% of the time. We do not hold any responsibility towards registering for courses, or any implications to using this service.
 
-We want to provide a service that will help students easily select and find classes with the given structure at NYU.
+With all this being said, it is our aspiration to help fellow NYU students easily find classes to their upcoming semesters, and we hope this helps!
 
 ## Data Fetching
 
