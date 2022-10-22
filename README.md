@@ -37,3 +37,4 @@ npm run dev
 - [] Add Wrapping Formatting for frontend
 - [] Finish Scraping
 - [] Deploy Redis Server
+- [] Design database structure
