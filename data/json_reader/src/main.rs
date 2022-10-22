@@ -1,6 +1,8 @@
 mod fetch;
 use std::{fs::File};
 use std::io::{Write, BufReader, BufRead};
+extern crate redis;
+use redis::Commands;
 
 use fetch::fetch::fetch_schools;
 
@@ -39,20 +41,26 @@ async fn fetch_courses_save_as_json(line_number: u32) {
 
 #[tokio::main]
 async fn main() {
-    let file = File::open("./course_info.txt").unwrap();
-    let mut output = File::create("./course_flat.json").unwrap();
-    let reader = BufReader::new(file);
-    let year = 2022;
-    let term = String::from("Fall");
-    let school_name = String::from("NYU Shanghai");
-    let subject_name = String::from("Bussiness and Finance");
-    for line in reader.lines() {
-        if let Ok(content) = line {
-            let json: NestedCourseInfoFull = serde_json::from_str(&*content).unwrap();
-            let res = json.flatten(year, &term, &school_name, &subject_name).unwrap();
-            for info in res.iter() {
-                write!(output, "{}\n", serde_json::to_string(info).unwrap()).unwrap();
-            }
-        }
-    }
+    // let file = File::open("./course_info.txt").unwrap();
+    // let mut output = File::create("./course_flat.json").unwrap();
+    // let reader = BufReader::new(file);
+    // let year = 2022;
+    // let term = String::from("Fall");
+    // let school_name = String::from("NYU Shanghai");
+    // let subject_name = String::from("Bussiness and Finance");
+    // for line in reader.lines() {
+    //     if let Ok(content) = line {
+    //         let json: NestedCourseInfoFull = serde_json::from_str(&*content).unwrap();
+    //         let res = json.flatten(year, &term, &school_name, &subject_name).unwrap();
+    //         for info in res.iter() {
+    //             write!(output, "{}\n", serde_json::to_string(info).unwrap()).unwrap();
+    //         }
+    //     }
+    // }
+    let cli = redis::Client::open("redis://127.0.0.1").expect("Server not found");
+    let mut con = cli.get_connection().expect("Cannot establish connection");
+    // let _: () = con.set("Sheldon", 10).expect("Set failed");
+    let val: Vec<String> = con.lrange("CSCI", 0, -1).unwrap();
+    let instructor: String = con.hget(&val[0], "instructor").unwrap();
+    println!("{:?}", instructor);
 }
