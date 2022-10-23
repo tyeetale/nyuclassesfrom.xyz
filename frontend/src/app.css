@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  @apply bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-50 text-center;
+}
