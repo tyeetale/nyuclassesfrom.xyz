@@ -35,5 +35,10 @@ npm run dev
 # TODOs
 
 - [] Add Wrapping Formatting for frontend
+  - Listen for the search query -> send to request on Upstash
+  - Return results (via readData)
 - [] Finish Scraping
-- [] Deploy Redis Server
+- [] Use Railway Redis Server ->
+- setting up flat schema
+- Redis Documentation: https://redis.io/commands/ft.create/
+- Add all json info to redis via a rust scipt that sets schema makes the connection
