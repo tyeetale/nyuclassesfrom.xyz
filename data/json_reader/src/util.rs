@@ -1,8 +1,8 @@
-use crate::fetch::json::*;
+use crate::json::*;
+use crate::types::Error;
 use chrono::prelude::*;
 use chrono::Duration;
 use reqwest::Url;
-use crate::fetch::types::Error;
 
 pub struct UrlBuilder {}
 
@@ -54,7 +54,7 @@ pub fn flattenize(schedule: &NestedCourseInfoFull, ) -> Result<Vec<FlatCourseInf
     Ok(vec![])
 }
 
-pub(crate) fn get_naive_schedule(
+pub(crate) fn get_naive_date_time(
     meetings: Option<&Vec<Meeting>>,
 ) -> Vec<(NaiveDateTime, NaiveDateTime)> {
     let mut res = Vec::new();
@@ -109,6 +109,10 @@ pub(crate) fn get_start_end_date(schedule: Option<&Vec<Meeting>>) -> (String, St
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn test_get_naive_date_time() {
+        
+    }
     #[test]
     fn test_flattenize() {
 

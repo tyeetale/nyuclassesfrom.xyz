@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 use tokio;
 
-use crate::fetch::json::{NestedCourseInfoFull, NestedCourseInfoSimple, Name};
-use crate::fetch::types::Error;
-use crate::fetch::util::UrlBuilder;
+use crate::json::{NestedCourseInfoFull, NestedCourseInfoSimple, Name};
+use crate::types::Error;
+use crate::util::UrlBuilder;
 
 pub async fn fetch_subjects() -> Result<HashMap<String, HashMap<String, Name>>, Error> {
     // first step, fetch the course and school info

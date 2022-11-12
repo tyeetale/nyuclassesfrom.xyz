@@ -1,14 +1,18 @@
 mod fetch;
+mod json;
+mod types;
+mod util;
+
 use std::{fs::File};
 use std::io::{Write, BufReader, BufRead};
 extern crate redis;
 use redis::Commands;
 
-use crate::fetch::fetch::fetch_schools;
+use fetch::fetch_schools;
 
-use crate::fetch::fetch::{fetch_subjects, fetch_course_catalog, fetch_course_details};
-use crate::fetch::util::*;
-use crate::fetch::json::*;
+use fetch::{fetch_subjects, fetch_course_catalog, fetch_course_details};
+use util::*;
+use json::*;
 
 fn read_and_process_catalog(path: &str, line_number: u32) -> Vec<(String, String, String)> {
     let file = File::open(path).unwrap();

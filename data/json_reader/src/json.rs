@@ -1,5 +1,5 @@
-use crate::fetch::types::{Error,};
-use crate::fetch::util::*;
+use crate::types::{Error,};
+use crate::util::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -87,7 +87,7 @@ impl NestedCourseInfoFull {
                 }
             }
             let (start_date, end_date) = get_start_end_date(section.meetings.as_ref());
-            let schedule = get_naive_schedule(section.meetings.as_ref());
+            let schedule = get_naive_date_time(section.meetings.as_ref());
             let meeting_days = get_meeting_days(&schedule);
             let (start_time, end_time) = {
                 if schedule.len() > 0 {
