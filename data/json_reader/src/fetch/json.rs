@@ -59,6 +59,7 @@ pub struct NestedCourseInfoFull {
 }
 
 impl NestedCourseInfoFull {
+    /// For each course with nested value, flatten it and create an object for each section
     pub fn flatten(
         self,
         year: u32,
@@ -68,7 +69,8 @@ impl NestedCourseInfoFull {
     ) -> Result<Vec<FlatCourseInfo>, Error> {
         let mut res = Vec::new();
         for section in self.sections.iter() {
-            let timezone = match &**school_name {
+            let timezone = match &*(*school_name) {
+                // Add other timezones
                 "NYU Shanghai" => String::from("\"+8\""),
                 "NYU Abu Dhabi" => String::from("\"+4\""),
                 _ => String::from("\"-4\""),
@@ -77,9 +79,9 @@ impl NestedCourseInfoFull {
             if let Some(info) = &self.description {
                 for (i, string) in info.split("\n").enumerate() {
                     if string.len() >= 11 && string[..11] == *"Fulfillment" {
+                        // Might no be scalable as some description may not start with the word fulfillment
                         fulfillment = Some(string.into());
                     } else if i == 0 {
-                        // this is the first 
                         description = Some(string.into());
                     }
                 }
@@ -195,3 +197,4 @@ pub struct Meeting {
     pub minutesDuration: u32,
     pub endDate: String,
 }
+

@@ -1,4 +1,4 @@
-use crate::fetch::json_structure::*;
+use crate::fetch::json::*;
 use chrono::prelude::*;
 use chrono::Duration;
 use reqwest::Url;
@@ -50,7 +50,11 @@ impl UrlBuilder {
     }
 }
 
-pub fn get_naive_schedule(
+pub fn flattenize(schedule: &NestedCourseInfoFull, ) -> Result<Vec<FlatCourseInfo>, Error> {
+    Ok(vec![])
+}
+
+pub(crate) fn get_naive_schedule(
     meetings: Option<&Vec<Meeting>>,
 ) -> Vec<(NaiveDateTime, NaiveDateTime)> {
     let mut res = Vec::new();
@@ -72,7 +76,7 @@ pub fn get_naive_schedule(
     res
 }
 
-pub fn get_meeting_days(schedule: &Vec<(NaiveDateTime, NaiveDateTime)>) -> (bool, bool, bool, bool, bool, bool, bool) {
+pub(crate) fn get_meeting_days(schedule: &Vec<(NaiveDateTime, NaiveDateTime)>) -> (bool, bool, bool, bool, bool, bool, bool) {
     let mut res = (false, false, false, false, false, false, false);
     for (start, end) in schedule {
         match start.weekday() {
@@ -88,7 +92,7 @@ pub fn get_meeting_days(schedule: &Vec<(NaiveDateTime, NaiveDateTime)>) -> (bool
     res
 }
 
-pub fn get_start_end_date(schedule: Option<&Vec<Meeting>>) -> (String, String) {
+pub(crate) fn get_start_end_date(schedule: Option<&Vec<Meeting>>) -> (String, String) {
     match schedule {
         None => {}
         Some(meetings) => {
@@ -101,4 +105,12 @@ pub fn get_start_end_date(schedule: Option<&Vec<Meeting>>) -> (String, String) {
         }
     }
     (String::from("Date unavailabe"), String::from("Date unavailable"))
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_flattenize() {
+
+    }
 }

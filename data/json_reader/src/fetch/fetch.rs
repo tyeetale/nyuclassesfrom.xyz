@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use tokio;
 
-use crate::fetch::json_structure::{NestedCourseInfoFull, NestedCourseInfoSimple, Name};
+use crate::fetch::json::{NestedCourseInfoFull, NestedCourseInfoSimple, Name};
 use crate::fetch::types::Error;
 use crate::fetch::util::UrlBuilder;
 
