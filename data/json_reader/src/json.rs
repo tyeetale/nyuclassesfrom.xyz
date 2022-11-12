@@ -1,4 +1,4 @@
-use crate::types::{Error,};
+use crate::types::Error;
 use crate::util::*;
 use serde::{Deserialize, Serialize};
 
@@ -61,7 +61,7 @@ pub struct NestedCourseInfoFull {
 impl NestedCourseInfoFull {
     /// For each course with nested value, flatten it and create an object for each section
     pub fn flatten(
-        self,
+        &self,
         year: u32,
         term: &String,
         school_name: &String,
@@ -87,13 +87,19 @@ impl NestedCourseInfoFull {
                 }
             }
             let (start_date, end_date) = get_start_end_date(section.meetings.as_ref());
-            let schedule = get_naive_date_time(section.meetings.as_ref());
+            let schedule = get_naive_date_time_v1(section.meetings.as_ref());
             let meeting_days = get_meeting_days(&schedule);
             let (start_time, end_time) = {
                 if schedule.len() > 0 {
-                    (schedule[0].0.time().to_string(), schedule[0].1.time().to_string());
+                    (
+                        schedule[0].0.time().to_string(),
+                        schedule[0].1.time().to_string(),
+                    );
                 }
-                (String::from("Time unavailable"), String::from("Time unavailable"))
+                (
+                    String::from("Time unavailable"),
+                    String::from("Time unavailable"),
+                )
             };
             let info = FlatCourseInfo {
                 school_name: school_name.clone(),
@@ -197,4 +203,3 @@ pub struct Meeting {
     pub minutesDuration: u32,
     pub endDate: String,
 }
-
