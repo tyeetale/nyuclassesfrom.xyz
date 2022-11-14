@@ -1,5 +1,4 @@
 use crate::types::Error;
-use crate::util::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -56,91 +55,6 @@ pub struct NestedCourseInfoFull {
     pub description: Option<String>,
     pub subjectCode: SubjectCode,
     pub sections: Vec<SectionFull>,
-}
-
-impl NestedCourseInfoFull {
-    /// For each course with nested value, flatten it and create an object for each section
-    pub fn flatten(
-        &self,
-        year: u32,
-        term: &String,
-        school_name: &String,
-        subject_name: &String,
-    ) -> Result<Vec<FlatCourseInfo>, Error> {
-        let mut res = Vec::new();
-        for section in self.sections.iter() {
-            let timezone = match &*(*school_name) {
-                // Add other timezones
-                "NYU Shanghai" => String::from("\"+8\""),
-                "NYU Abu Dhabi" => String::from("\"+4\""),
-                _ => String::from("\"-4\""),
-            };
-            let (mut description, mut fulfillment) = (None, None);
-            if let Some(info) = &self.description {
-                for (i, string) in info.split("\n").enumerate() {
-                    if string.len() >= 11 && string[..11] == *"Fulfillment" {
-                        // Might no be scalable as some description may not start with the word fulfillment
-                        fulfillment = Some(string.into());
-                    } else if i == 0 {
-                        description = Some(string.into());
-                    }
-                }
-            }
-            let (start_date, end_date) = get_start_end_date(section.meetings.as_ref());
-            let schedule = get_naive_date_time_v1(section.meetings.as_ref());
-            let meeting_days = get_meeting_days(&schedule);
-            let (start_time, end_time) = {
-                if schedule.len() > 0 {
-                    (
-                        schedule[0].0.time().to_string(),
-                        schedule[0].1.time().to_string(),
-                    );
-                }
-                (
-                    String::from("Time unavailable"),
-                    String::from("Time unavailable"),
-                )
-            };
-            let info = FlatCourseInfo {
-                school_name: school_name.clone(),
-                school_code: self.subjectCode.school.clone(),
-                subject_name: subject_name.clone(),
-                subject_code: self.subjectCode.code.clone(),
-                subject_number: self.deptCourseId.clone(),
-                class_name: self.name.clone(),
-                term: term.clone(),
-                year: year,
-                units: section.maxUnits,
-                class_number: section.registrationNumber,
-                section: section.code.clone(),
-                grading: section.grading.clone(),
-                course_location: section.location.clone(),
-                session_start: start_date,
-                session_end: end_date,
-                class_status: section.status.clone(),
-                instruction_mode: section.instructionMode.clone(),
-                component: section.r#type.clone(),
-                meet_monday: meeting_days.0,
-                meet_tuesday: meeting_days.1,
-                meet_wednesday: meeting_days.2,
-                meet_thursday: meeting_days.3,
-                meet_friday: meeting_days.4,
-                meet_saturday: meeting_days.5,
-                meet_sunday: meeting_days.6,
-                start_time: start_time,
-                end_time: end_time,
-                at: section.location.clone(),
-                timezone: timezone,
-                instructors: section.instructors.clone(),
-                description: description,
-                prerequisits: section.prerequisites.clone(),
-                fulfillment: fulfillment,
-                notes: section.notes.clone(),
-            };
-            res.push(info);
-        }
-        Ok(res)
-    }
 }
 
 #[allow(non_snake_case)]

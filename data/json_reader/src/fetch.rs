@@ -5,7 +5,7 @@ use crate::json::{NestedCourseInfoFull, NestedCourseInfoSimple, Name};
 use crate::types::Error;
 use crate::util::UrlBuilder;
 
-pub async fn fetch_subjects() -> Result<HashMap<String, HashMap<String, Name>>, Error> {
+pub(crate) async fn fetch_subjects() -> Result<HashMap<String, HashMap<String, Name>>, Error> {
     // first step, fetch the course and school info
     let url = UrlBuilder::build_subjects_endpoint_url()?;
 
@@ -23,7 +23,7 @@ pub async fn fetch_subjects() -> Result<HashMap<String, HashMap<String, Name>>, 
     };
 }
 
-pub async fn fetch_schools() -> Result<HashMap<String, Name>, Error> {
+pub(crate) async fn fetch_schools() -> Result<HashMap<String, Name>, Error> {
     let url = UrlBuilder::build_schools_endpoint_url()?;
 
     match reqwest::get(url).await {
@@ -40,7 +40,7 @@ pub async fn fetch_schools() -> Result<HashMap<String, Name>, Error> {
     };
 }
 
-pub async fn fetch_course_catalog(
+pub(crate) async fn fetch_course_catalog(
     year: u32,
     semester: &String,
     school_subject_catalog: &HashMap<String, HashMap<String, Name>>,
@@ -87,7 +87,7 @@ pub async fn fetch_course_catalog(
 
 // we can reduce the block rate of requests by writing a dynamic window for
 // sending requests
-pub async fn fetch_course_details(catalog: &Vec<(String, String, String)>) -> Result<Vec<NestedCourseInfoFull>, Error> {
+pub(crate) async fn fetch_course_details(catalog: &Vec<(String, String, String)>) -> Result<Vec<NestedCourseInfoFull>, Error> {
     let mut course_info_list = Vec::new();
     let mut fetch_handles = Vec::new();
     let mut parse_handles = Vec::new();
