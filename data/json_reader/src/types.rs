@@ -7,4 +7,5 @@ pub enum Error {
     ParseContentFailed,
     JoinTaskFailed,
     CannotFlattenJson,
+    RedisError,
 }

@@ -2,17 +2,17 @@ mod fetch;
 mod json;
 mod types;
 mod util;
+mod redis_db;
 
-use std::{fs::File};
-use std::io::{Write, BufReader, BufRead};
-extern crate redis;
-use redis::Commands;
+use std::fs::File;
+use std::io::{BufRead, BufReader, Write};
 
 use fetch::fetch_schools;
 
-use fetch::{fetch_subjects, fetch_course_catalog, fetch_course_details};
-use util::*;
+use fetch::{fetch_course_catalog, fetch_course_details, fetch_subjects};
 use json::*;
+use redis_db::create_schema;
+use util::*;
 
 fn read_and_process_catalog(path: &str, line_number: u32) -> Vec<(String, String, String)> {
     let file = File::open(path).unwrap();
@@ -34,37 +34,17 @@ fn read_and_process_catalog(path: &str, line_number: u32) -> Vec<(String, String
 async fn fetch_courses_save_as_json(line_number: u32) {
     let catalog = read_and_process_catalog("./course_catalog.txt", line_number);
     let mut file = File::create("./course_info.txt").unwrap();
-    
+
     let info = fetch_course_details(&catalog).await.unwrap();
-    
+
     for i in info.into_iter() {
         let serialized_content = serde_json::to_string(&i).unwrap();
         write!(file, "{}\n", serialized_content).unwrap();
     }
 }
 
-#[tokio::main]
-async fn main() {
-    // let file = File::open("./course_info.txt").unwrap();
-    // let mut output = File::create("./course_flat.json").unwrap();
-    // let reader = BufReader::new(file);
-    // let year = 2022;
-    // let term = String::from("Fall");
-    // let school_name = String::from("NYU Shanghai");
-    // let subject_name = String::from("Bussiness and Finance");
-    // for line in reader.lines() {
-    //     if let Ok(content) = line {
-    //         let json: NestedCourseInfoFull = serde_json::from_str(&*content).unwrap();
-    //         let res = json.flatten(year, &term, &school_name, &subject_name).unwrap();
-    //         for info in res.iter() {
-    //             write!(output, "{}\n", serde_json::to_string(info).unwrap()).unwrap();
-    //         }
-    //     }
-    // }
-    let cli = redis::Client::open("redis://127.0.0.1").expect("Server not found");
-    let mut con = cli.get_connection().expect("Cannot establish connection");
-    // let _: () = con.set("Sheldon", 10).expect("Set failed");
-    let val: Vec<String> = con.lrange("CSCI", 0, -1).unwrap();
-    let instructor: String = con.hget(&val[0], "instructor").unwrap();
-    println!("{:?}", instructor);
+fn main() {
+    let mut con = redis_db::connect_redis("127.0.0.1").expect("Redis failure");
+    // create schema and search index
+    create_schema(&mut con).expect("Cannot create schema");
 }

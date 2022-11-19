@@ -1,4 +1,3 @@
-use crate::types::Error;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
