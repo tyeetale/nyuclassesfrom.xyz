@@ -40,5 +40,5 @@ npm run dev
 - [] Finish Scraping
 - [] Use Railway Redis Server ->
 - Redis Documentation: https://redis.io/commands/ft.create/ https://redis.io/docs/stack/search/indexing_json/
-- Step 1: Create Redis schema with FT.CREATE (load RediSearch and RedisJSON before running)
-- Step 2: Load fetched JSON data into the redis server
+- Step 1: Create Redis schema with FT.CREATE (the server must run the redis stack, to run redis stack on docker, run: docker run -d --name redis -p 6379:6379 redis/redis-stack-server:latest)
+- Step 2: Load fetched data into the redis server
