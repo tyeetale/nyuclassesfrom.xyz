@@ -380,7 +380,7 @@ mod tests {
                 let course: NestedCourseInfoFull = serde_json::from_str(&*content).unwrap();
                 let res = flatten(&school_name, &subject_name, year, &term, &course).unwrap();
                 for info in res.iter() {
-                    write!(output, "{},\n", serde_json::to_string(info).unwrap()).unwrap();
+                    write!(output, "{}\n", serde_json::to_string(info).unwrap()).unwrap();
                 }
             }
         }

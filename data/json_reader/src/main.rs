@@ -11,7 +11,7 @@ use fetch::fetch_schools;
 
 use fetch::{fetch_course_catalog, fetch_course_details, fetch_subjects};
 use json::*;
-use redis_db::create_schema;
+use redis_db::create_index;
 use util::*;
 
 fn read_and_process_catalog(path: &str, line_number: u32) -> Vec<(String, String, String)> {
@@ -44,7 +44,5 @@ async fn fetch_courses_save_as_json(line_number: u32) {
 }
 
 fn main() {
-    let mut con = redis_db::connect_redis("127.0.0.1").expect("Redis failure");
-    // create schema and search index
-    create_schema(&mut con).expect("Cannot create schema");
+    
 }
