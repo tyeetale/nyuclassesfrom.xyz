@@ -1,14 +1,15 @@
 use crate::json::*;
 use crate::types::Error;
-use chrono::format;
-use chrono::naive;
 use chrono::prelude::*;
 use chrono::Duration;
+use std::env;
+use dotenv;
 use reqwest::Url;
 use std::cmp;
 
 pub struct UrlBuilder {}
 
+#[allow(dead_code)]
 impl UrlBuilder {
     pub fn build_schools_endpoint_url() -> Result<Url, Error> {
         let url = "https://schedge.a1liu.com/schools";
@@ -25,7 +26,7 @@ impl UrlBuilder {
         }
     }
     pub fn build_courses_endpoint_url(
-        year: u32,
+        year: u16,
         semester: &String,
         school: &String,
         subject: &String,
@@ -58,12 +59,15 @@ impl UrlBuilder {
             _ => Err(Error::BuildUrlFailed(url)),
         }
     }
+    pub fn build_redis_url(password: &String, url: &String) -> String {
+        return format!("redis://default:{}@{}", password, url);
+    }
 }
 
 pub fn flatten(
     school: &String,
     subject: &String,
-    year: u32,
+    year: u16,
     term: &String,
     course: &NestedCourseInfoFull,
 ) -> Result<Vec<FlatCourseInfo>, Error> {
@@ -104,7 +108,7 @@ pub fn flatten(
             school_name: school.clone(),
             subject_name: subject.clone(),
             term: term.clone(),
-            year: year,
+            year: year as u32,
             // determined based on the school
             timezone: timezone.clone(),
             school_code: course.subjectCode.school.clone(),
@@ -193,7 +197,10 @@ fn get_description_fulfillment(string: &String) -> (Option<String>, Option<Strin
     let mut description = None;
     let mut fulfillment = None;
     for (i, s) in string.split("\n").enumerate() {
-        if s.len() >= 11 && s[..11] == *"Fulfillment" {
+        // To accomodate utf-8 strings, we need to find the actual end index
+        
+        let end = s.char_indices().map(|(i, _)|i).nth(11);
+        if end.is_some() && s[..end.unwrap()] == *"Fulfillment" {
             fulfillment = Some(clean_up_string(&s[11..]).to_string());
         } else if s.len() > 0 && i == 0 {
             // assuming that all descriptions starts with description text
@@ -230,16 +237,22 @@ fn clean_up_string(string: &str) -> &str {
     &string[start..end + 1]
 }
 
+#[allow(dead_code)]
+pub fn read_env_variables() -> (String, String) {
+    dotenv::dotenv().expect("Failed to read .env file");
+    (env::var("REDIS_URL").expect("Redis URL not found"), env::var("REDIS_PW").expect("Redis password not found"))
+}
+
 #[cfg(test)]
 mod tests {
     use chrono;
-    use std::fmt::format;
     use std::fs::File;
     use std::io::{Write, BufReader, BufRead};
     use crate::json::{Meeting, NestedCourseInfoFull};
     use crate::util::{
-        get_description_fulfillment, get_meeting_days, get_start_end_date, get_start_end_hour, get_time_zone, flatten
+        get_description_fulfillment, get_meeting_days, get_start_end_date, get_start_end_hour, get_time_zone, flatten, read_env_variables
     };
+
     #[test]
     fn test_get_naive_date_time() {
         let m1 = Meeting {
@@ -366,8 +379,8 @@ mod tests {
     #[test]
     // This function flattens nested jsons and appends them to the json folder
     fn test_output_json() {
-        let file = File::open("./course_info.txt").unwrap();
-        let file_name = format!("./json/course_flat_{}.json", chrono::Local::now().naive_utc().to_string());
+        let file = File::open("./cached/course_non_flat.txt").unwrap();
+        let file_name = format!("./cached/course_flat_{}.json", chrono::Local::now().naive_utc().to_string());
         let mut output = File::create(file_name).unwrap();
         let reader = BufReader::new(file);
 
@@ -384,5 +397,11 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn test_read_env_var() {
+        let (url, pw) = read_env_variables();
+        println!("URL: {}, Password: {}", url, pw);
     }
 }

@@ -43,7 +43,7 @@ pub struct FlatCourseInfo {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Name {
-    name: String,
+    pub name: String,
 }
 
 #[allow(non_snake_case)]

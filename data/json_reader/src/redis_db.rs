@@ -3,7 +3,7 @@ use redis::*;
 use serde_json;
 
 pub(crate) fn connect_redis(addr: &str) -> Result<Connection, RedisError> {
-    let cli = redis::Client::open(format!("redis://{}", addr))?;
+    let cli = redis::Client::open(addr)?;
     let con = cli.get_connection()?;
     Ok(con)
 }
@@ -55,10 +55,15 @@ pub(crate) fn create_index(con: &mut Connection) -> Result<(), RedisError> {
         .query(con)
 }
 
+#[allow(dead_code)]
 pub(crate) fn drop_index(con: &mut Connection) -> Result<(), RedisError> {
     redis::cmd("FT.DROPINDEX")
         .arg("idx:courses")
         .query(con)
+}
+
+pub(crate) fn get_existing_indexes(con: &mut Connection) -> Result<Vec<String>, RedisError> {
+    redis::cmd("FT._LIST").query(con)
 }
 
 // This function inserts a flattened course info into redisDB
@@ -75,20 +80,27 @@ pub(crate) fn insert_course(
 }
 
 #[cfg(test)]
+#[allow(dead_code, unused_variables)]
 mod test {
     use crate::redis_db::*;
+    use crate::util::{UrlBuilder, read_env_variables};
     use std::{fs::File, io::{BufRead, BufReader}};
+
     #[test]
     fn test_create_schema() {
-        let mut con = connect_redis("127.0.0.1").expect("Failed to connect to redis server");
+        // env file
+        // let (url, password) = read_env_variables();
+        let mut con = connect_redis("redis://127.0.0.1").expect("Cannot connect to redis db");
         create_index(&mut con).expect("Failed to create schema");
+        let indexes: Result<Vec<String>, RedisError>= redis::cmd("FT._LIST").query(&mut con);
+        println!("{:?}", indexes);
     }
 
     #[test]
     fn test_insert_record() {
         // read and deserialize course info stored in json
-        let mut con = connect_redis("127.0.0.1").expect("Failed creating connection");
-        drop_index(&mut con);
+        let (url, password) = read_env_variables();
+        let mut con = connect_redis(&*UrlBuilder::build_redis_url(&password, &url)).expect("Cannot connect to redis db");
         create_index(&mut con).expect("Failed to create schema");
         let file = File::open("./json/course_flat.json").unwrap();
         let reader = BufReader::new(file);
