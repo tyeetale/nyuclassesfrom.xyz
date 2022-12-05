@@ -1,13 +1,14 @@
 mod fetch;
 mod json;
-mod redis_db;
+mod database;
 mod types;
 mod util;
 
 use fetch::*;
 use indicatif::ProgressBar;
-use redis_db::*;
+use database::*;
 use util::*;
+// use meilisearch_sdk::{task_info::TaskInfo, errors::Error};
 
 #[tokio::main]
 async fn main() {
@@ -25,16 +26,9 @@ async fn main() {
     let mut class_ctr = 0;
 
     // Initialize redis connection
-    let credentials = read_env_variables();
-    let url = UrlBuilder::build_redis_url(&credentials.1, &credentials.0);
-    // REPLACE THIS URL WITH URL TO REDIS INSTANCE
-    let mut con = connect_redis(&*url).expect("Failed to connect to redis database");
-    println!("Connected to Redis instance");
-    let indexes = get_existing_indexes(&mut con);
-    if indexes.is_err() || !indexes.unwrap().contains(&String::from("idx:courses")) {
-        create_index(&mut con).expect("Failed to create index");
-        println!("Index created");
-    }
+    let (url, key) = read_env_variables();
+    let mut con = connect_database(&*url, &*key);
+    println!("Connected to database");
 
     for (school_code, subject_codes) in &subjects {
         let mut tmp = Vec::new();
@@ -96,13 +90,10 @@ async fn main() {
                 .expect(&*format!("Subject {} does not exist in {}", &course_detail.subjectCode.code, school_code))
                 .name;
             // Cleaning data
-            let flattened = flatten(school_name, subject_name, year, &semester, course_detail)
+            let flattened = flatten(&mut class_ctr, school_name, subject_name, year, &semester, course_detail)
                 .expect("Failed to flatten nested course");
             // insert all records into database
-            for flat_course in &flattened {
-                insert_course(class_ctr, flat_course, &mut con).expect("Failed to insert course");
-                class_ctr += 1;
-            }
+            insert_course(&flattened, &mut con).expect("Failed to insert course into database");
             bar.inc(1);
         }
         school_ctr += 1;

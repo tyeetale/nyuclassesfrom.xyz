@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FlatCourseInfo {
+    // Unique ID used as the primary key
+    pub id: u32,
     pub school_name: String,
     pub school_code: String,
     // no such field can be found
