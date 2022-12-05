@@ -87,6 +87,7 @@ async fn main() {
 
         // Insert into database
         println!("[{}/{}] Uploading to database", school_ctr, subjects.len());
+        let bar = ProgressBar::new(course_details.len() as u64);
         for course_detail in &course_details {
             let subject_name = &subjects
                 .get(&course_detail.subjectCode.school)
@@ -102,7 +103,9 @@ async fn main() {
                 insert_course(class_ctr, flat_course, &mut con).expect("Failed to insert course");
                 class_ctr += 1;
             }
+            bar.inc(1);
         }
         school_ctr += 1;
+        bar.finish();
     }
 }
