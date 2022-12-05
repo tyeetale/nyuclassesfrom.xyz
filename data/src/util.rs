@@ -65,6 +65,7 @@ impl UrlBuilder {
 }
 
 pub fn flatten(
+    id: &mut u32,
     school: &String,
     subject: &String,
     year: u16,
@@ -105,6 +106,7 @@ pub fn flatten(
         };
         res.push(FlatCourseInfo {
             // These fields will be determined by inputs
+            id: *id,
             school_name: school.clone(),
             subject_name: subject.clone(),
             term: term.clone(),
@@ -141,7 +143,8 @@ pub fn flatten(
             session_end: end_date,
             description: description.clone(),
             fulfillment: fulfillment.clone(),
-        })
+        });
+        *id += 1;
     }
     Ok(res)
 }
@@ -240,7 +243,7 @@ fn clean_up_string(string: &str) -> &str {
 #[allow(dead_code)]
 pub fn read_env_variables() -> (String, String) {
     dotenv::dotenv().expect("Failed to read .env file");
-    (env::var("REDIS_URL").expect("Redis URL not found"), env::var("REDIS_PW").expect("Redis password not found"))
+    (env::var("DB_URL").expect("URL not found"), env::var("DB_KEY").expect("Key not found"))
 }
 
 #[cfg(test)]
@@ -388,10 +391,11 @@ mod tests {
         let term = String::from("Fall");
         let school_name = String::from("NYU Shanghai");
         let subject_name = String::from("Bussiness and Finance");
+        let mut id = 0;
         for line in reader.lines() {
             if let Ok(content) = line {
                 let course: NestedCourseInfoFull = serde_json::from_str(&*content).unwrap();
-                let res = flatten(&school_name, &subject_name, year, &term, &course).unwrap();
+                let res = flatten(&mut id, &school_name, &subject_name, year, &term, &course).unwrap();
                 for info in res.iter() {
                     write!(output, "{}\n", serde_json::to_string(info).unwrap()).unwrap();
                 }
