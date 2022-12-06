@@ -37,8 +37,7 @@ npm run dev
 - [] Add Wrapping Formatting for frontend
   - Listen for the search query -> send to request on Upstash
   - Return results (via readData)
-- [] Finish Scraping
-- [] Use Railway Redis Server ->
-- Redis Documentation: https://redis.io/commands/ft.create/ https://redis.io/docs/stack/search/indexing_json/
-- Step 1: Create Redis schema with FT.CREATE (the server must run the redis stack, to run redis stack on docker, run: docker run -d --name redis -p 6379:6379 redis/redis-stack-server:latest)
-- Step 2: Load fetched data into the redis server
+- [] Adapt to the latest version of course search API: https://github.com/A1Liu/schedge
+  - Update the fetch logic in main (now we only need to do one fetch to get school and subjects info, and for each subject, make one call only to fetch all course info)
+  - Update the structure of JSON object for serialization/deserialization
+  - Update the parsing logic for certain fields (e.g. description)
