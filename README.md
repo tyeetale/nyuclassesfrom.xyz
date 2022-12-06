@@ -41,3 +41,11 @@ npm run dev
   - Update the fetch logic in main (now we only need to do one fetch to get school and subjects info, and for each subject, make one call only to fetch all course info)
   - Update the structure of JSON object for serialization/deserialization
   - Update the parsing logic for certain fields (e.g. description)
+ 
+# Future Work
+To keep the "class status" field up to date with what's displayed on Albert, we need to synchronize the cache and the data on Albert. The consistency model will be eventual consistency, and we use the following mechanism to uphold this consistency model
+
+- Each course record has a TTL
+- When a user queries a certain course, we check the TTL value
+  - If the record is not expired, we return all the data as stored
+  - If the record is expired (given the TTL), we return all but the class_status field. Meanwhile, we perform another scrap on Albert. Once the data is acquired, we update the data on the cache, and push it to the client.
