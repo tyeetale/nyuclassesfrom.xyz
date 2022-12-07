@@ -49,3 +49,6 @@ To keep the "class status" field up to date with what's displayed on Albert, we 
 - When a user queries a certain course, we check the TTL value
   - If the record is not expired, we return all the data as stored
   - If the record is expired (given the TTL), we return all but the class_status field. Meanwhile, we perform another scrap on Albert. Once the data is acquired, we update the data on the cache, and push it to the client.
+
+For now we assume that data fetched from the schedge api is up to date.
+To achieve the above consistency model we need a server that records the expiry dates of every course record. Everytime a user requests a course record, the server checks the expiry date of the record then return the user the course detail from the databse.
