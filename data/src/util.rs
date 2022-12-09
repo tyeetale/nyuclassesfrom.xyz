@@ -9,8 +9,15 @@ use std::cmp;
 
 pub struct UrlBuilder {}
 
-#[allow(dead_code)]
 impl UrlBuilder {
+    // this is the url points to the latest api
+    pub fn build_schools_url(term: &String) -> Result<Url, Error> {
+        let url = &*format!("https://nyu.a1liu.com/api/schools/{}", term);
+        match Url::parse(url) {
+            Ok(res) => Ok(res),
+            _ => Err(Error::BuildUrlFailed(String::from(url)))
+        }
+    }
     pub fn build_schools_endpoint_url() -> Result<Url, Error> {
         let url = "https://schedge.a1liu.com/schools";
         match Url::parse(url) {
@@ -58,9 +65,6 @@ impl UrlBuilder {
             Ok(res) => Ok(res),
             _ => Err(Error::BuildUrlFailed(url)),
         }
-    }
-    pub fn build_redis_url(password: &String, url: &String) -> String {
-        return format!("redis://default:{}@{}", password, url);
     }
 }
 

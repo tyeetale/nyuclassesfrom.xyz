@@ -48,6 +48,7 @@ pub struct Name {
     pub name: String,
 }
 
+// We now only need this struct
 #[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct NestedCourseInfoFull {
@@ -58,6 +59,7 @@ pub struct NestedCourseInfoFull {
     pub sections: Vec<SectionFull>,
 }
 
+// Delete this struct
 #[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct NestedCourseInfoSimple {
@@ -67,12 +69,14 @@ pub struct NestedCourseInfoSimple {
     pub sections: Vec<SectionSimple>,
 }
 
+// Delete this struct
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SubjectCode {
     pub code: String,
     pub school: String,
 }
 
+// Delete this struct
 #[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SectionSimple {
@@ -89,6 +93,7 @@ pub struct SectionSimple {
     pub location: String,
 }
 
+// We only need this struct
 #[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SectionFull {
@@ -108,6 +113,7 @@ pub struct SectionFull {
     pub grading: String,
     pub location: String,
     pub notes: Option<String>,
+    // Delete this field
     pub prerequisites: Option<String>,
 }
 
@@ -117,4 +123,34 @@ pub struct Meeting {
     pub beginDate: String,
     pub minutesDuration: u32,
     pub endDate: String,
+    /* 
+    TODO
+    Add beginDateLocal and endDateLocal
+    */ 
 }
+
+// We need to add another struct here to store the schools
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SchoolCatalog {
+    term: String,
+    schools: Vec<SchoolInfo>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SchoolInfo {
+    name: String,
+    code: String,
+    subjects: Vec<SubjectInfo>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SubjectInfo {
+    code: String,
+    name: String,
+}
+
+// #[cfg(test)]
+// mod tests {
+//     use crate::json::*;
+//     use crate::util::*;
+// }
