@@ -9,20 +9,20 @@ use std::cmp;
 
 pub struct UrlBuilder {}
 
+pub enum Season {
+    January,
+    Spring,
+    Summer,
+    Fall,
+}
+
 impl UrlBuilder {
     // this is the url points to the latest api
-    pub fn build_schools_url(term: &String) -> Result<Url, Error> {
+    pub fn build_schools_endpoint_url(term: &String) -> Result<Url, Error> {
         let url = &*format!("https://nyu.a1liu.com/api/schools/{}", term);
         match Url::parse(url) {
             Ok(res) => Ok(res),
             _ => Err(Error::BuildUrlFailed(String::from(url)))
-        }
-    }
-    pub fn build_schools_endpoint_url() -> Result<Url, Error> {
-        let url = "https://schedge.a1liu.com/schools";
-        match Url::parse(url) {
-            Ok(res) => Ok(res),
-            _ => Err(Error::BuildUrlFailed(String::from(url))),
         }
     }
     pub fn build_subjects_endpoint_url() -> Result<Url, Error> {
@@ -65,6 +65,18 @@ impl UrlBuilder {
             Ok(res) => Ok(res),
             _ => Err(Error::BuildUrlFailed(url)),
         }
+    }
+}
+
+impl Season {
+    fn get_short_name(&self) -> String {
+        let res = match self {
+            Season::January => "ja",
+            Season::Spring => "sp",
+            Season::Summer => "su",
+            Season::Fall => "fa",
+        };
+        res.to_string()
     }
 }
 
@@ -244,10 +256,13 @@ fn clean_up_string(string: &str) -> &str {
     &string[start..end + 1]
 }
 
-#[allow(dead_code)]
 pub fn read_env_variables() -> (String, String) {
     dotenv::dotenv().expect("Failed to read .env file");
     (env::var("DB_URL").expect("URL not found"), env::var("DB_KEY").expect("Key not found"))
+}
+
+pub fn get_term_str(season: &Season, year: u16) -> String {
+    format!("{}{}", season.get_short_name(), year)
 }
 
 #[cfg(test)]
@@ -266,11 +281,15 @@ mod tests {
             beginDate: String::from("2022-09-01 14:00:00"),
             minutesDuration: 75,
             endDate: String::from("2022-12-14 23:59:00"),
+            beginDateLocal: String::from("2022-09-01 14:00:00"),
+            endDateLocal: String::from("2022-12-14 23:59:00"),
         };
         let m2 = Meeting {
             beginDate: String::from("2022-09-01 10:00:00"),
             minutesDuration: 0,
             endDate: String::from("2022-12-14 23:59:00"),
+            beginDateLocal: String::from("2022-09-01 10:00:00"),
+            endDateLocal: String::from("2022-12-14 23:59:00"),
         };
         let sched1 = get_start_end_hour(&m1);
         assert_eq!(sched1, (String::from("14:00:00"), String::from("15:15:00")));
@@ -286,16 +305,22 @@ mod tests {
                 beginDate: String::from("2022-08-31 09:00:00"),
                 minutesDuration: 180,
                 endDate: String::from("2022-08-31 23:59:00"),
+                beginDateLocal: String::from("2022-08-31 09:00:00"),
+                endDateLocal: String::from("2022-08-31 23:59:00"),
             },
             Meeting {
                 beginDate: String::from("2022-08-30 09:00:00"),
                 minutesDuration: 420,
                 endDate: String::from("2022-08-30 23:59:00"),
+                beginDateLocal: String::from("2022-08-30 09:00:00"),
+                endDateLocal: String::from("2022-08-30 23:59:00"),
             },
             Meeting {
                 beginDate: String::from("2022-08-29 09:00:00"),
                 minutesDuration: 180,
                 endDate: String::from("2022-08-29 23:59:00"),
+                beginDateLocal: String::from("2022-08-29 09:00:00"),
+                endDateLocal: String::from("2022-08-29 23:59:00"),
             },
         ];
 
@@ -310,16 +335,22 @@ mod tests {
                 beginDate: String::from("2022-08-31 09:00:00"),
                 minutesDuration: 180,
                 endDate: String::from("2022-08-31 23:59:00"),
+                beginDateLocal: String::from("2022-08-31 09:00:00"),
+                endDateLocal: String::from("2022-08-31 23:59:00"),
             },
             Meeting {
                 beginDate: String::from("2022-08-30 09:00:00"),
                 minutesDuration: 420,
                 endDate: String::from("2022-08-30 23:59:00"),
+                beginDateLocal: String::from("2022-08-30 09:00:00"),
+                endDateLocal: String::from("2022-08-30 23:59:00"),
             },
             Meeting {
                 beginDate: String::from("2022-08-29 09:00:00"),
                 minutesDuration: 180,
                 endDate: String::from("2022-08-29 23:59:00"),
+                beginDateLocal: String::from("2022-08-29 09:00:00"),
+                endDateLocal: String::from("2022-08-29 23:59:00"),
             },
         ];
 
@@ -328,11 +359,15 @@ mod tests {
                 beginDate: String::from("2022-06-30 09:00:00"),
                 minutesDuration: 180,
                 endDate: String::from("2022-08-31 23:59:00"),
+                beginDateLocal: String::from("2022-06-30 09:00:00"),
+                endDateLocal: String::from("2022-08-31 23:59:00"),
             },
             Meeting {
                 beginDate: String::from("2022-07-01 09:00:00"),
                 minutesDuration: 420,
                 endDate: String::from("2022-08-30 23:59:00"),
+                beginDateLocal: String::from("2022-07-01 09:00:00"),
+                endDateLocal: String::from("2022-08-30 23:59:00"),
             },
         ];
 
@@ -383,29 +418,29 @@ mod tests {
         assert_eq!(tz2, "\"+4\"");
     }
 
-    #[test]
-    // This function flattens nested jsons and appends them to the json folder
-    fn test_output_json() {
-        let file = File::open("./cached/course_non_flat.txt").unwrap();
-        let file_name = format!("./cached/course_flat_{}.json", chrono::Local::now().naive_utc().to_string());
-        let mut output = File::create(file_name).unwrap();
-        let reader = BufReader::new(file);
+    // #[test]
+    // // This function flattens nested jsons and appends them to the json folder
+    // fn test_output_json() {
+    //     let file = File::open("./cached/course_non_flat.txt").unwrap();
+    //     let file_name = format!("./cached/course_flat_{}.json", chrono::Local::now().naive_utc().to_string());
+    //     let mut output = File::create(file_name).unwrap();
+    //     let reader = BufReader::new(file);
 
-        let year = 2022;
-        let term = String::from("Fall");
-        let school_name = String::from("NYU Shanghai");
-        let subject_name = String::from("Bussiness and Finance");
-        let mut id = 0;
-        for line in reader.lines() {
-            if let Ok(content) = line {
-                let course: NestedCourseInfoFull = serde_json::from_str(&*content).unwrap();
-                let res = flatten(&mut id, &school_name, &subject_name, year, &term, &course).unwrap();
-                for info in res.iter() {
-                    write!(output, "{}\n", serde_json::to_string(info).unwrap()).unwrap();
-                }
-            }
-        }
-    }
+    //     let year = 2022;
+    //     let term = String::from("Fall");
+    //     let school_name = String::from("NYU Shanghai");
+    //     let subject_name = String::from("Bussiness and Finance");
+    //     let mut id = 0;
+    //     for line in reader.lines() {
+    //         if let Ok(content) = line {
+    //             let course: NestedCourseInfoFull = serde_json::from_str(&*content).unwrap();
+    //             let res = flatten(&mut id, &school_name, &subject_name, year, &term, &course).unwrap();
+    //             for info in res.iter() {
+    //                 write!(output, "{}\n", serde_json::to_string(info).unwrap()).unwrap();
+    //             }
+    //         }
+    //     }
+    // }
 
     #[test]
     fn test_read_env_var() {
