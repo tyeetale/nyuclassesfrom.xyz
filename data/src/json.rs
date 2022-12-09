@@ -5,9 +5,9 @@ pub struct FlatCourseInfo {
     // Unique ID used as the primary key
     pub id: u32,
     pub school_name: String,
-    pub school_code: String,
     // no such field can be found
     pub subject_name: String,
+    // We only keep the subject code for simplicity
     pub subject_code: String,
     pub subject_number: String,
     pub class_name: String,
@@ -43,54 +43,14 @@ pub struct FlatCourseInfo {
     pub notes: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Name {
-    pub name: String,
-}
-
-// We now only need this struct
 #[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct NestedCourseInfoFull {
     pub name: String,
     pub deptCourseId: String,
     pub description: Option<String>,
-    pub subjectCode: SubjectCode,
+    pub subjectCode: String,
     pub sections: Vec<SectionFull>,
-}
-
-// Delete this struct
-#[allow(non_snake_case)]
-#[derive(Serialize, Deserialize, Debug)]
-pub struct NestedCourseInfoSimple {
-    pub name: String,
-    pub deptCourseId: String,
-    pub subjectCode: SubjectCode,
-    pub sections: Vec<SectionSimple>,
-}
-
-// Delete this struct
-#[derive(Serialize, Deserialize, Debug)]
-pub struct SubjectCode {
-    pub code: String,
-    pub school: String,
-}
-
-// Delete this struct
-#[allow(non_snake_case)]
-#[derive(Serialize, Deserialize, Debug)]
-pub struct SectionSimple {
-    pub registrationNumber: u32,
-    pub code: String,
-    pub instructors: Vec<String>,
-    pub r#type: String,
-    pub status: String,
-    pub meetings: Option<Vec<Meeting>>,
-    pub instructionMode: Option<String>,
-    pub name: String,
-    pub minUnits: f32,
-    pub maxUnits: f32,
-    pub location: String,
 }
 
 // We only need this struct
@@ -113,8 +73,6 @@ pub struct SectionFull {
     pub grading: String,
     pub location: String,
     pub notes: Option<String>,
-    // Delete this field
-    pub prerequisites: Option<String>,
 }
 
 #[allow(non_snake_case)]
@@ -123,10 +81,8 @@ pub struct Meeting {
     pub beginDate: String,
     pub minutesDuration: u32,
     pub endDate: String,
-    /* 
-    TODO
-    Add beginDateLocal and endDateLocal
-    */ 
+    pub beginDateLocal: String,
+    pub endDateLocal: String,
 }
 
 // We need to add another struct here to store the schools
@@ -149,8 +105,36 @@ pub struct SubjectInfo {
     name: String,
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use crate::json::*;
-//     use crate::util::*;
-// }
+/* LEGACY CODE */
+// Delete this struct
+#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SectionSimple {
+    pub registrationNumber: u32,
+    pub code: String,
+    pub instructors: Vec<String>,
+    pub r#type: String,
+    pub status: String,
+    pub meetings: Option<Vec<Meeting>>,
+    pub instructionMode: Option<String>,
+    pub name: String,
+    pub minUnits: f32,
+    pub maxUnits: f32,
+    pub location: String,
+}
+// Delete this struct
+#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct NestedCourseInfoSimple {
+    pub name: String,
+    pub deptCourseId: String,
+    pub subjectCode: SubjectCode,
+    pub sections: Vec<SectionSimple>,
+}
+
+// Delete this struct
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SubjectCode {
+    pub code: String,
+    pub school: String,
+}
