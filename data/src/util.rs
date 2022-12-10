@@ -2,10 +2,10 @@ use crate::json::*;
 use crate::types::Error;
 use chrono::prelude::*;
 use chrono::Duration;
-use std::env;
 use dotenv;
 use reqwest::Url;
 use std::cmp;
+use std::env;
 
 pub struct UrlBuilder {}
 
@@ -35,7 +35,7 @@ impl UrlBuilder {
         let url = &*format!("https://nyu.a1liu.com/api/schools/{}", term);
         match Url::parse(url) {
             Ok(res) => Ok(res),
-            _ => Err(Error::BuildUrlFailed(String::from(url)))
+            _ => Err(Error::BuildUrlFailed(String::from(url))),
         }
     }
     pub fn build_courses_endpoint_url(
@@ -77,27 +77,41 @@ pub fn flatten(
 ) -> Result<Vec<FlatCourseInfo>, Error> {
     let mut res = Vec::new();
     // we create an instance for each session
-    let (description, fulfillment) = {
+    let (description, fulfillment, prerequisite) = {
         match &course.description {
-            Some(description) => get_description_fulfillment(&description),
-            None => (None, None),
+            Some(description) => get_description_fulfillment_prerequisite(&description),
+            None => (None, None, None),
         }
     };
-    let timezone = get_time_zone(school);
+    let timezone = {
+        if course.sections[0].meetings.is_none()
+            || course.sections[0].meetings.as_ref().unwrap().len() == 0
+        {
+            String::from("")
+        } else {
+            get_time_zone(&course.sections[0].meetings.as_ref().unwrap()[0].beginDateLocal)
+        }
+    };
     for section in &course.sections {
         let (start_date, end_date) = {
             if let Some(meetings) = &section.meetings {
                 get_start_end_date(meetings)
             } else {
-                (String::from("Time unavailable"), String::from("Time unavailable"))
+                (
+                    String::from("Time unavailable"),
+                    String::from("Time unavailable"),
+                )
             }
         };
         // Could be problematic when different sessions in a week have different hours
         let (start_hour, end_hour) = {
-            if let Some(meetings) = &section.meetings {
-                get_start_end_hour(&meetings[0])
+            if section.meetings.is_none() || section.meetings.as_ref().unwrap().len() == 0 {
+                (
+                    String::from("Time unavailable"),
+                    String::from("Time unavailable"),
+                )
             } else {
-                (String::from("Time unavailable"), String::from("Time unavailable"))
+                get_start_end_hour(&section.meetings.as_ref().unwrap()[0])
             }
         };
         let meet_days = {
@@ -110,23 +124,23 @@ pub fn flatten(
         res.push(FlatCourseInfo {
             // These fields will be determined by inputs
             id: *id,
-            school_name: school.clone(),
-            subject_name: subject.clone(),
-            term: term.clone(),
+            school_name: school.to_owned(),
+            subject_name: subject.to_owned(),
+            term: term.to_owned(),
             year: year as u32,
             // determined based on the school
-            timezone: timezone.clone(),
-            subject_code: course.subjectCode.clone(),
-            subject_number: course.deptCourseId.clone(),
-            class_name: course.name.clone(),
+            timezone: timezone.to_owned(),
+            subject_code: course.subjectCode.to_owned(),
+            subject_number: course.deptCourseId.to_owned(),
+            class_name: course.name.to_owned(),
             units: section.maxUnits,
             class_number: section.registrationNumber,
-            section: section.code.clone(),
-            grading: section.grading.clone(),
-            course_location: section.location.clone(),
-            class_status: section.status.clone(),
-            instruction_mode: section.instructionMode.clone(),
-            component: section.r#type.clone(),
+            section: section.code.to_owned(),
+            grading: section.grading.to_owned(),
+            course_location: section.location.to_owned(),
+            class_status: section.status.to_owned(),
+            instruction_mode: section.instructionMode.to_owned(),
+            component: section.r#type.to_owned(),
             meet_monday: meet_days.0,
             meet_tuesday: meet_days.1,
             meet_wednesday: meet_days.2,
@@ -134,18 +148,18 @@ pub fn flatten(
             meet_friday: meet_days.4,
             meet_saturday: meet_days.5,
             meet_sunday: meet_days.6,
-            instructors: section.instructors.clone(),
+            instructors: section.instructors.to_owned(),
             // Need to fill this field with other values
-            prerequisits: None,
-            notes: section.notes.clone(),
-            at: section.location.clone(),
+            prerequisite: prerequisite.to_owned(),
+            notes: section.notes.to_owned(),
+            at: section.location.to_owned(),
             // we need to calculate the rest of the fields
             start_time: start_hour,
             end_time: end_hour,
             session_start: start_date,
             session_end: end_date,
-            description: description.clone(),
-            fulfillment: fulfillment.clone(),
+            description: description.to_owned(),
+            fulfillment: fulfillment.to_owned(),
         });
         *id += 1;
     }
@@ -153,11 +167,14 @@ pub fn flatten(
 }
 
 fn get_naive_date_time(date: &String) -> NaiveDateTime {
-    NaiveDateTime::parse_from_str(date, "%Y-%m-%d %H:%M:%S").unwrap()
+    match NaiveDateTime::parse_from_str(date, "%Y-%m-%dT%H:%M:%S%z") {
+        Ok(datetime) => datetime,
+        _ => NaiveDateTime::parse_from_str(date, "%Y-%m-%dT%H:%M:%SZ").unwrap(),
+    }
 }
 
 fn get_start_end_hour(meeting: &Meeting) -> (String, String) {
-    let naive_start_time = get_naive_date_time(&meeting.beginDate);
+    let naive_start_time = get_naive_date_time(&meeting.beginDateLocal);
     let duration = Duration::minutes(meeting.minutesDuration.into());
     let naive_end_time = naive_start_time + duration;
     let naive_schedule = (
@@ -170,7 +187,7 @@ fn get_start_end_hour(meeting: &Meeting) -> (String, String) {
 fn get_meeting_days(meetings: &Vec<Meeting>) -> (bool, bool, bool, bool, bool, bool, bool) {
     let mut res = (false, false, false, false, false, false, false);
     for meeting in meetings {
-        let naive_date_time = get_naive_date_time(&meeting.beginDate);
+        let naive_date_time = get_naive_date_time(&meeting.beginDateLocal);
         match naive_date_time.weekday() {
             Weekday::Mon => res.0 = true,
             Weekday::Tue => res.1 = true,
@@ -187,41 +204,82 @@ fn get_meeting_days(meetings: &Vec<Meeting>) -> (bool, bool, bool, bool, bool, b
 fn get_start_end_date(meetings: &Vec<Meeting>) -> (String, String) {
     // get the earliest date as the start date
     // get the latest date as the end date
-    let mut earliest_date = get_naive_date_time(&meetings[0].beginDate).date();
-    let mut latest_date = get_naive_date_time(&meetings[0].endDate).date();
+    if meetings.len() == 0 {
+        return ("".to_string(), "".to_string());
+    }
+    let mut earliest_date = get_naive_date_time(&meetings[0].beginDateLocal).date();
+    let mut latest_date = get_naive_date_time(&meetings[0].endDateLocal).date();
     for meeting in meetings {
-        let begin = get_naive_date_time(&meeting.beginDate).date();
-        let end = get_naive_date_time(&meeting.endDate).date();
+        let begin = get_naive_date_time(&meeting.beginDateLocal).date();
+        let end = get_naive_date_time(&meeting.endDateLocal).date();
         earliest_date = cmp::min(earliest_date, begin);
         latest_date = cmp::max(latest_date, end);
     }
     (earliest_date.to_string(), latest_date.to_string())
 }
 
-fn get_description_fulfillment(string: &String) -> (Option<String>, Option<String>) {
-    // Split the string by \n
+fn get_description_fulfillment_prerequisite(
+    string: &String,
+) -> (Option<String>, Option<String>, Option<String>) {
+    if string.len() == 0 {
+        return (None, None, None);
+    }
     let mut description = None;
     let mut fulfillment = None;
-    for (i, s) in string.split("\n").enumerate() {
-        // To accomodate utf-8 strings, we need to find the actual end index
-        
-        let end = s.char_indices().map(|(i, _)|i).nth(11);
-        if end.is_some() && s[..end.unwrap()] == *"Fulfillment" {
-            fulfillment = Some(clean_up_string(&s[11..]).to_string());
-        } else if s.len() > 0 && i == 0 {
-            // assuming that all descriptions starts with description text
-            description = Some(clean_up_string(&s).to_string());
+    let mut prerequisite = None;
+
+    let tmp = string.to_lowercase();
+
+    // This is unable to cover all string patterns (actual patterns include pre-requisite, and may appear in notes field)
+    match (tmp.find("fulfillment"), tmp.find("prerequisite")) {
+        (None, None) => description = Some(string.clone()),
+        (Some(ful_idx), None) => {
+            // for some reasons we don't need to convert to UTF-8 string anymore...
+            let end = ful_idx + 12;
+            if ful_idx == 0 {
+                // everything is fulfillment
+                fulfillment = Some(clean_up_string(&string[end..]).to_string());
+            } else {
+                // split the string at the index
+                description = Some(clean_up_string(&string[..ful_idx]).to_string());
+                fulfillment = Some(clean_up_string(&string[end..]).to_string());
+            }
+        }
+        (None, Some(pre_idx)) => {
+            let end = pre_idx + 13;
+            if pre_idx == 0 {
+                prerequisite = Some(clean_up_string(&string[end..]).to_string());
+            } else {
+                description = Some(clean_up_string(&string[..pre_idx]).to_string());
+                prerequisite = Some(clean_up_string(&string[end..]).to_string());
+            }
+        }
+        (Some(ful_idx), Some(pre_idx)) => {
+            let end1 = ful_idx + 12;
+            let end2 = pre_idx + 13;
+            if ful_idx < pre_idx {
+                if ful_idx != 0 {
+                    description = Some(clean_up_string(&string[..ful_idx]).to_string());
+                }
+                fulfillment = Some(clean_up_string(&string[end1..pre_idx]).to_string());
+                prerequisite = Some(clean_up_string(&string[end2..]).to_string());
+            } else {
+                if pre_idx != 0 {
+                    description = Some(clean_up_string(&string[..pre_idx]).to_string());
+                }
+                prerequisite = Some(clean_up_string(&string[end2..ful_idx]).to_string());
+                fulfillment = Some(clean_up_string(&string[end1..]).to_string());
+            }
         }
     }
-    (description, fulfillment)
+    (description, fulfillment, prerequisite)
 }
 
-fn get_time_zone(school: &String) -> String {
+fn get_time_zone(date: &String) -> String {
     // Only supports three locations now
-    match &school[..] {
-        "NYU Abu Dhabi" => String::from("\"+4\""),
-        "NYU Shanghai" => String::from("\"+8\""),
-        _ => String::from("\"-5\""),
+    match DateTime::parse_from_str(date, "%Y-%m-%dT%H:%M:%S%z") {
+        Ok(time) => time.timezone().to_string(),
+        _ => String::from("+00:00"),
     }
 }
 
@@ -229,6 +287,7 @@ fn clean_up_string(string: &str) -> &str {
     if string.len() == 0 {
         return string;
     }
+    // println!("{}", string);
     let mut start = 0;
     let mut end = string.len() - 1;
     // Sanity check before stripping
@@ -237,7 +296,7 @@ fn clean_up_string(string: &str) -> &str {
     {
         start += 1;
     }
-    while string.chars().nth(end).is_some() && string.chars().nth(end).unwrap() == ' ' {
+    while string.chars().nth(end).is_some() && string.chars().nth(end).unwrap() == ' ' && end > 0 {
         end -= 1;
     }
     &string[start..end + 1]
@@ -245,7 +304,10 @@ fn clean_up_string(string: &str) -> &str {
 
 pub fn read_env_variables() -> (String, String) {
     dotenv::dotenv().expect("Failed to read .env file");
-    (env::var("DB_URL").expect("URL not found"), env::var("DB_KEY").expect("Key not found"))
+    (
+        env::var("DB_URL").expect("URL not found"),
+        env::var("DB_KEY").expect("Key not found"),
+    )
 }
 
 pub fn get_term_str(season: &Season, year: u16) -> String {
@@ -254,32 +316,30 @@ pub fn get_term_str(season: &Season, year: u16) -> String {
 
 #[cfg(test)]
 mod tests {
-    // use chrono;
-    // use std::fs::File;
-    // use std::io::{Write, BufReader, BufRead};
-    use crate::json::{Meeting,};
+    use crate::json::Meeting;
     use crate::util::{
-        get_description_fulfillment, get_meeting_days, get_start_end_date, get_start_end_hour, get_time_zone, read_env_variables
+        get_description_fulfillment_prerequisite, get_meeting_days, get_start_end_date,
+        get_start_end_hour, get_time_zone, read_env_variables,
     };
 
     #[test]
     fn test_get_naive_date_time() {
         let m1 = Meeting {
-            beginDate: String::from("2022-09-01 14:00:00"),
+            beginDate: String::from("2023-01-31T01:45:00Z"),
             minutesDuration: 75,
-            endDate: String::from("2022-12-14 23:59:00"),
-            beginDateLocal: String::from("2022-09-01 14:00:00"),
-            endDateLocal: String::from("2022-12-14 23:59:00"),
+            endDate: String::from("2023-05-12T15:59:00Z"),
+            beginDateLocal: String::from("2023-01-31T09:45:00+08:00"),
+            endDateLocal: String::from("2023-05-12T23:59:00+08:00"),
         };
         let m2 = Meeting {
-            beginDate: String::from("2022-09-01 10:00:00"),
+            beginDate: String::from("2022-09-01T10:00:00Z"),
             minutesDuration: 0,
-            endDate: String::from("2022-12-14 23:59:00"),
-            beginDateLocal: String::from("2022-09-01 10:00:00"),
-            endDateLocal: String::from("2022-12-14 23:59:00"),
+            endDate: String::from("2022-12-14T23:59:00Z"),
+            beginDateLocal: String::from("2022-09-01T10:00:00+08:00"),
+            endDateLocal: String::from("2022-12-14T23:59:00+08:00"),
         };
         let sched1 = get_start_end_hour(&m1);
-        assert_eq!(sched1, (String::from("14:00:00"), String::from("15:15:00")));
+        assert_eq!(sched1, (String::from("09:45:00"), String::from("11:00:00")));
 
         let sched2 = get_start_end_hour(&m2);
         assert_eq!(sched2, (String::from("10:00:00"), String::from("10:00:00")));
@@ -289,25 +349,25 @@ mod tests {
     fn test_get_meeting_days() {
         let sched1 = vec![
             Meeting {
-                beginDate: String::from("2022-08-31 09:00:00"),
+                beginDate: String::from("2022-08-31T09:00:00Z"),
                 minutesDuration: 180,
-                endDate: String::from("2022-08-31 23:59:00"),
-                beginDateLocal: String::from("2022-08-31 09:00:00"),
-                endDateLocal: String::from("2022-08-31 23:59:00"),
+                endDate: String::from("2022-08-31T23:59:00Z"),
+                beginDateLocal: String::from("2022-08-31T09:00:00+08:00"),
+                endDateLocal: String::from("2022-08-31T23:59:00+08:00"),
             },
             Meeting {
-                beginDate: String::from("2022-08-30 09:00:00"),
+                beginDate: String::from("2022-08-30T09:00:00Z"),
                 minutesDuration: 420,
-                endDate: String::from("2022-08-30 23:59:00"),
-                beginDateLocal: String::from("2022-08-30 09:00:00"),
-                endDateLocal: String::from("2022-08-30 23:59:00"),
+                endDate: String::from("2022-08-30T23:59:00Z"),
+                beginDateLocal: String::from("2022-08-30T09:00:00+08:00"),
+                endDateLocal: String::from("2022-08-30T23:59:00+08:00"),
             },
             Meeting {
-                beginDate: String::from("2022-08-29 09:00:00"),
+                beginDate: String::from("2022-08-29T09:00:00Z"),
                 minutesDuration: 180,
-                endDate: String::from("2022-08-29 23:59:00"),
-                beginDateLocal: String::from("2022-08-29 09:00:00"),
-                endDateLocal: String::from("2022-08-29 23:59:00"),
+                endDate: String::from("2022-08-29T23:59:00Z"),
+                beginDateLocal: String::from("2022-08-29T09:00:00+08:00"),
+                endDateLocal: String::from("2022-08-29T23:59:00+08:00"),
             },
         ];
 
@@ -319,42 +379,42 @@ mod tests {
     fn test_get_start_end_date() {
         let sched1 = vec![
             Meeting {
-                beginDate: String::from("2022-08-31 09:00:00"),
+                beginDate: String::from("2022-08-31T09:00:00Z"),
                 minutesDuration: 180,
-                endDate: String::from("2022-08-31 23:59:00"),
-                beginDateLocal: String::from("2022-08-31 09:00:00"),
-                endDateLocal: String::from("2022-08-31 23:59:00"),
+                endDate: String::from("2022-08-31T23:59:00Z"),
+                beginDateLocal: String::from("2022-08-31T09:00:00-05:00"),
+                endDateLocal: String::from("2022-08-31T23:59:00-05:00"),
             },
             Meeting {
-                beginDate: String::from("2022-08-30 09:00:00"),
+                beginDate: String::from("2022-08-30T09:00:00Z"),
                 minutesDuration: 420,
-                endDate: String::from("2022-08-30 23:59:00"),
-                beginDateLocal: String::from("2022-08-30 09:00:00"),
-                endDateLocal: String::from("2022-08-30 23:59:00"),
+                endDate: String::from("2022-08-30T23:59:00Z"),
+                beginDateLocal: String::from("2022-08-30T09:00:00-05:00"),
+                endDateLocal: String::from("2022-08-30T23:59:00-05:00"),
             },
             Meeting {
-                beginDate: String::from("2022-08-29 09:00:00"),
+                beginDate: String::from("2022-08-29T09:00:00Z"),
                 minutesDuration: 180,
-                endDate: String::from("2022-08-29 23:59:00"),
-                beginDateLocal: String::from("2022-08-29 09:00:00"),
-                endDateLocal: String::from("2022-08-29 23:59:00"),
+                endDate: String::from("2022-08-29T23:59:00Z"),
+                beginDateLocal: String::from("2022-08-29T09:00:00-05:00"),
+                endDateLocal: String::from("2022-08-29T23:59:00-05:00"),
             },
         ];
 
         let sched2 = vec![
             Meeting {
-                beginDate: String::from("2022-06-30 09:00:00"),
+                beginDate: String::from("2022-06-30T09:00:00Z"),
                 minutesDuration: 180,
-                endDate: String::from("2022-08-31 23:59:00"),
-                beginDateLocal: String::from("2022-06-30 09:00:00"),
-                endDateLocal: String::from("2022-08-31 23:59:00"),
+                endDate: String::from("2022-08-31T23:59:00Z"),
+                beginDateLocal: String::from("2022-06-30T09:00:00-05:00"),
+                endDateLocal: String::from("2022-08-31T23:59:00-05:00"),
             },
             Meeting {
-                beginDate: String::from("2022-07-01 09:00:00"),
+                beginDate: String::from("2022-07-01T09:00:00Z"),
                 minutesDuration: 420,
-                endDate: String::from("2022-08-30 23:59:00"),
-                beginDateLocal: String::from("2022-07-01 09:00:00"),
-                endDateLocal: String::from("2022-08-30 23:59:00"),
+                endDate: String::from("2022-08-30T23:59:00Z"),
+                beginDateLocal: String::from("2022-07-01T09:00:00-05:00"),
+                endDateLocal: String::from("2022-08-30T23:59:00-05:00"),
             },
         ];
 
@@ -369,40 +429,66 @@ mod tests {
 
     #[test]
     fn test_get_description_requirement() {
-        let des1 = String::from("Covers the principles and design of operating systems. Topics include process scheduling and synchronization, deadlocks, memory management (including virtual memory), input-output, and file systems. Programming assignments. \nPrerequisite: CSCI-SHU 210 Data Structures AND (CENG-SHU 202 Computer Architecture or CSCI-UA 201 Computer Systems Organization).\nFulfillment: Computer Science Major Required Courses; Computer Systems Engineering Major Elective; Data Science Major Courses for Concentration in Computer Science.");
-        let (description, fulfillment) = get_description_fulfillment(&des1);
-        assert_eq!(description, Some(String::from("Covers the principles and design of operating systems. Topics include process scheduling and synchronization, deadlocks, memory management (including virtual memory), input-output, and file systems. Programming assignments.")));
-        assert_eq!(fulfillment, Some(String::from("Computer Science Major Required Courses; Computer Systems Engineering Major Elective; Data Science Major Courses for Concentration in Computer Science.")));
+        let des1 = String::from("An embedded system is a computer system with a dedicated function within a larger mechanical or electrical system, often with real-time computing constraints. It is embedded as part of a complete device often including hardware and mechanical parts. Embedded systems control many devices in common use today. Topics covered include microcontroller architecture, assembler programming, interrupts, peripheral interfacing, embedded system design, higher-level languages on embedded Systems, as well as a brief introduction to real-time operating systems. Practical Lab Exercises complement the lectures. The students will further specialize and consolidate their knowledge through semester-long hands-on projects. Prerequisite: ( CSCI-SHU 11 or CSCI-SHU 101 ) AND (CENG-SHU 202 or CENG-SHU 201). Fulfillment: CS elective; CE Required, EE Additional Electives.");
+        let (description, fulfillment, prerequisite) =
+            get_description_fulfillment_prerequisite(&des1);
+        assert_eq!(description, Some(String::from("An embedded system is a computer system with a dedicated function within a larger mechanical or electrical system, often with real-time computing constraints. It is embedded as part of a complete device often including hardware and mechanical parts. Embedded systems control many devices in common use today. Topics covered include microcontroller architecture, assembler programming, interrupts, peripheral interfacing, embedded system design, higher-level languages on embedded Systems, as well as a brief introduction to real-time operating systems. Practical Lab Exercises complement the lectures. The students will further specialize and consolidate their knowledge through semester-long hands-on projects.")));
+        assert_eq!(
+            fulfillment,
+            Some(String::from(
+                "CS elective; CE Required, EE Additional Electives."
+            ))
+        );
+        assert_eq!(
+            prerequisite,
+            Some(String::from(
+                "( CSCI-SHU 11 or CSCI-SHU 101 ) AND (CENG-SHU 202 or CENG-SHU 201)."
+            ))
+        );
 
-        let des2 = String::from("An intense hands-on study of practical techniques and methods of software engineering. Topics include: advanced object-oriented design, design patterns, refactoring, code optimization, universal modeling language, threading, user interface design, enterprise application development and development tools. All topics are integrated and applied during the semester-long group project. The aim of the project is to prepare students for dynamics in a real workplace. Members of the group will meet on a regular basis to discuss the project and to assign individual tasks. Students will be judged primarily on the final project presentations. \nPrerequisites: Intro to Computer Science. \nFulfillment: CS Electives.");
-        let (description, fulfillment) = get_description_fulfillment(&des2);
-        assert_eq!(description, Some(String::from("An intense hands-on study of practical techniques and methods of software engineering. Topics include: advanced object-oriented design, design patterns, refactoring, code optimization, universal modeling language, threading, user interface design, enterprise application development and development tools. All topics are integrated and applied during the semester-long group project. The aim of the project is to prepare students for dynamics in a real workplace. Members of the group will meet on a regular basis to discuss the project and to assign individual tasks. Students will be judged primarily on the final project presentations.")));
-        assert_eq!(fulfillment, Some(String::from("CS Electives.")));
+        let des2 = String::from("In this class, students will learn about the theoretical foundations of machine learning and how to apply these to solve real-world data-driven problems. We will apply machine learning to numerical, textual, and image data. Topics will be drawn from perceptron algorithm, regression, gradient descent and stochastic gradient descent, support vector machines, kernels for support vector machines, recommendation systems, decision trees and random forests, maximum likelihood, estimation, logistic regression, neural networks and the back propagation algorithm, convolutional neural networks, recurrent neural networks, Bayesian analysis and naive Bayes, clustering, latent Dirichlet allocation (LDA), sentiment analysis, dimensionality reduction and principle component analysis, reinforcement learning. Prerequisites: Introduction to Computer Programming, Calculus, and (Probability and Statistics OR Theory of Probability OR Statistics for Business & Economics). Fulfillment: Business Analytics Track; Computer Science Electives; Data Science Major Data Analysis Courses.");
+        let (description, fulfillment, prerequisite) =
+            get_description_fulfillment_prerequisite(&des2);
+        assert_eq!(description, Some(String::from("In this class, students will learn about the theoretical foundations of machine learning and how to apply these to solve real-world data-driven problems. We will apply machine learning to numerical, textual, and image data. Topics will be drawn from perceptron algorithm, regression, gradient descent and stochastic gradient descent, support vector machines, kernels for support vector machines, recommendation systems, decision trees and random forests, maximum likelihood, estimation, logistic regression, neural networks and the back propagation algorithm, convolutional neural networks, recurrent neural networks, Bayesian analysis and naive Bayes, clustering, latent Dirichlet allocation (LDA), sentiment analysis, dimensionality reduction and principle component analysis, reinforcement learning.")));
+        assert_eq!(fulfillment, Some(String::from("Business Analytics Track; Computer Science Electives; Data Science Major Data Analysis Courses.")));
+        assert_eq!(prerequisite, Some(String::from("Introduction to Computer Programming, Calculus, and (Probability and Statistics OR Theory of Probability OR Statistics for Business & Economics).")));
 
-        let des3 = String::from("The course covers modeling an application and logical database design, the relational model and relational data definition and data manipulation languages, design of relational databases and normalization theory, physical database design, query processing and optimization, transaction processing focusing on concurrency and recovery. The labs emphasize experiential learning of database systems and applications and an insight into various database management systems and query languages.\nPrerequisite: CSCI-SHU 210 Data Structures.");
-        let (description, fulfillment) = get_description_fulfillment(&des3);
-        assert_eq!(description, Some(String::from("The course covers modeling an application and logical database design, the relational model and relational data definition and data manipulation languages, design of relational databases and normalization theory, physical database design, query processing and optimization, transaction processing focusing on concurrency and recovery. The labs emphasize experiential learning of database systems and applications and an insight into various database management systems and query languages.")));
+        let des3 = String::from("In this class, students will learn about the theoretical foundations of machine learning and how to apply these to solve real-world data-driven problems. We will apply machine learning to numerical, textual, and image data. Topics will be drawn from perceptron algorithm, regression, gradient descent and stochastic gradient descent, support vector machines, kernels for support vector machines, recommendation systems, decision trees and random forests, maximum likelihood, estimation, logistic regression, neural networks and the back propagation algorithm, convolutional neural networks, recurrent neural networks, Bayesian analysis and naive Bayes, clustering, latent Dirichlet allocation (LDA), sentiment analysis, dimensionality reduction and principle component analysis, reinforcement learning.");
+        let (description, fulfillment, prerequisite) =
+            get_description_fulfillment_prerequisite(&des3);
+        assert_eq!(description, Some(String::from("In this class, students will learn about the theoretical foundations of machine learning and how to apply these to solve real-world data-driven problems. We will apply machine learning to numerical, textual, and image data. Topics will be drawn from perceptron algorithm, regression, gradient descent and stochastic gradient descent, support vector machines, kernels for support vector machines, recommendation systems, decision trees and random forests, maximum likelihood, estimation, logistic regression, neural networks and the back propagation algorithm, convolutional neural networks, recurrent neural networks, Bayesian analysis and naive Bayes, clustering, latent Dirichlet allocation (LDA), sentiment analysis, dimensionality reduction and principle component analysis, reinforcement learning.")));
         assert_eq!(fulfillment, None);
+        assert_eq!(prerequisite, None);
 
         let des4 = String::from("");
-        let (description, fulfillment) = get_description_fulfillment(&des4);
+        let (description, fulfillment, prerequisite) =
+            get_description_fulfillment_prerequisite(&des4);
         assert_eq!(description, None);
         assert_eq!(fulfillment, None);
+        assert_eq!(prerequisite, None);
 
         let des5 = String::from("Fulfillment: hello.");
-        let (description, fulfillment) = get_description_fulfillment(&des5);
+        let (description, fulfillment, prerequisite) =
+            get_description_fulfillment_prerequisite(&des5);
         assert_eq!(description, None);
         assert_eq!(fulfillment, Some(String::from("hello.")));
+        assert_eq!(prerequisite, None);
+
+        let des6 = String::from("Prerequisite: permission of the department. Does not satisfy the major elective requirement. 2-4 credits Students majoring in computer science are permitted to work on an individual basis under the supervision of a full-time faculty member in the department if they have maintained an overall GPA of 3.0 and a GPA of 3.5 in computer science and have a study proposal that is approved by a computer science professor. Students are expected to spend about two to three hours a week per credit (a 4-credit IS would involve about ten to twelve hours a week) on their project. Fulfillment: Computer Science Major Electives. ");
+        let (d, f, p) = get_description_fulfillment_prerequisite(&des6);
+        assert_eq!(d, None);
+        assert_eq!(p, Some(String::from("permission of the department. Does not satisfy the major elective requirement. 2-4 credits Students majoring in computer science are permitted to work on an individual basis under the supervision of a full-time faculty member in the department if they have maintained an overall GPA of 3.0 and a GPA of 3.5 in computer science and have a study proposal that is approved by a computer science professor. Students are expected to spend about two to three hours a week per credit (a 4-credit IS would involve about ten to twelve hours a week) on their project.")));
+        assert_eq!(f, Some(String::from("Computer Science Major Electives.")))
     }
 
     #[test]
     fn test_get_time_zone() {
-        let loc1 = String::from("NYU Shanghai");
-        let loc2 = String::from("NYU Abu Dhabi");
+        let loc1 = String::from("2022-07-01T09:00:00-05:00");
+        let loc2 = String::from("2023-01-30T08:45:00+08:00");
         let tz1 = get_time_zone(&loc1);
         let tz2 = get_time_zone(&loc2);
-        assert_eq!(tz1, "\"+8\"");
-        assert_eq!(tz2, "\"+4\"");
+        assert_eq!(tz1, "-05:00");
+        assert_eq!(tz2, "+08:00");
     }
 
     // #[test]

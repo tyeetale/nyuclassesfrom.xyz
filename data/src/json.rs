@@ -38,7 +38,7 @@ pub struct FlatCourseInfo {
     pub timezone: String,
     pub instructors: Vec<String>,
     pub description: Option<String>,
-    pub prerequisits: Option<String>,
+    pub prerequisite: Option<String>,
     pub fulfillment: Option<String>,
     pub notes: Option<String>,
 }
@@ -103,38 +103,4 @@ pub struct SchoolInfo {
 pub struct SubjectInfo {
     pub code: String,
     pub name: String,
-}
-
-/* LEGACY CODE */
-// Delete this struct
-#[allow(non_snake_case)]
-#[derive(Serialize, Deserialize, Debug)]
-pub struct SectionSimple {
-    pub registrationNumber: u32,
-    pub code: String,
-    pub instructors: Vec<String>,
-    pub r#type: String,
-    pub status: String,
-    pub meetings: Option<Vec<Meeting>>,
-    pub instructionMode: Option<String>,
-    pub name: String,
-    pub minUnits: f32,
-    pub maxUnits: f32,
-    pub location: String,
-}
-// Delete this struct
-#[allow(non_snake_case)]
-#[derive(Serialize, Deserialize, Debug)]
-pub struct NestedCourseInfoSimple {
-    pub name: String,
-    pub deptCourseId: String,
-    pub subjectCode: SubjectCode,
-    pub sections: Vec<SectionSimple>,
-}
-
-// Delete this struct
-#[derive(Serialize, Deserialize, Debug)]
-pub struct SubjectCode {
-    pub code: String,
-    pub school: String,
 }

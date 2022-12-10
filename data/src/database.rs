@@ -13,12 +13,13 @@ pub(crate) fn connect_database(url: &str, key: &str) -> Client {
 // This function inserts a flattened course info into the database
 pub(crate) fn insert_course(
     course: &Vec<FlatCourseInfo>,
+    index: &str,
     cli: &mut Client,
 ) -> Result<TaskInfo, Error> {
     // block on uploading the file
     // would be great if we could do this in parallel to receiving documents
     // so that we can fully utilize the duplex bandwidth
-    block_on(cli.index("course").add_documents(course, None))
+    block_on(cli.index(index).add_documents(course, None))
 }
 
 #[cfg(test)]
@@ -60,6 +61,7 @@ mod test {
     fn test_delete_all_docs() {
         let (url, key) = read_env_variables();
         let cli = connect_database(&*url, &*key);
-        block_on(cli.index("course").delete_all_documents()).unwrap();
+        block_on(cli.index("course-sp2023").delete_all_documents()).unwrap();
+        block_on(cli.index("course-sp2023").delete()).unwrap();
     }
 }
