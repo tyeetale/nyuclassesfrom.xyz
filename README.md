@@ -37,10 +37,6 @@ npm run dev
 - [] Add Wrapping Formatting for frontend
   - Listen for the search query -> send to request on Upstash
   - Return results (via readData)
-- [] Adapt to the latest version of course search API: https://github.com/A1Liu/schedge
-  - Update the fetch logic in main (now we only need to do one fetch to get school and subjects info, and for each subject, make one call only to fetch all course info)
-  - Update the structure of JSON object for serialization/deserialization
-  - Update the parsing logic for certain fields (e.g. description)
  
 # Future Work
 To keep the "class status" field up to date with what's displayed on Albert, we need to synchronize the cache and the data on Albert. The consistency model will be eventual consistency, and we use the following mechanism to uphold this consistency model
