@@ -9,11 +9,24 @@ use std::cmp;
 
 pub struct UrlBuilder {}
 
+#[allow(dead_code)]
+#[derive(Debug)]
 pub enum Season {
     January,
     Spring,
     Summer,
     Fall,
+}
+
+impl ToString for Season {
+    fn to_string(&self) -> String {
+        match self {
+            Self::January => String::from("January"),
+            Self::Spring => String::from("Spring"),
+            Self::Summer => String::from("Summer"),
+            Self::Fall => String::from("Fall"),
+        }
+    }
 }
 
 impl UrlBuilder {
@@ -25,41 +38,15 @@ impl UrlBuilder {
             _ => Err(Error::BuildUrlFailed(String::from(url)))
         }
     }
-    pub fn build_subjects_endpoint_url() -> Result<Url, Error> {
-        let url = "https://schedge.a1liu.com/subjects";
-        match Url::parse(url) {
-            Ok(res) => Ok(res),
-            _ => Err(Error::BuildUrlFailed(String::from(url))),
-        }
-    }
     pub fn build_courses_endpoint_url(
+        term: &Season,
         year: u16,
-        semester: &String,
-        school: &String,
         subject: &String,
     ) -> Result<Url, Error> {
         let url = format!(
-            "https://schedge.a1liu.com/{year}/{semester}/{school}/{subject}",
-            year = year,
-            semester = *semester,
-            school = school,
-            subject = subject
-        );
-        match Url::parse(&*url) {
-            Ok(res) => Ok(res),
-            _ => Err(Error::BuildUrlFailed(url)),
-        }
-    }
-    pub fn build_search_endpoint_url(
-        course: &String,
-        school: &String,
-        subject: &String,
-    ) -> Result<Url, Error> {
-        let url = format!(
-            "https://schedge.a1liu.com/2022/fa/search?full=true&query={course}&school={school}&subject={subject}",
-            course=course,
-            school=school,
-            subject=subject
+            "https://nyu.a1liu.com/api/courses/{}/{}",
+            get_term_str(term, year),
+            subject
         );
         match Url::parse(&*url) {
             Ok(res) => Ok(res),
@@ -129,8 +116,7 @@ pub fn flatten(
             year: year as u32,
             // determined based on the school
             timezone: timezone.clone(),
-            school_code: course.subjectCode.school.clone(),
-            subject_code: course.subjectCode.code.clone(),
+            subject_code: course.subjectCode.clone(),
             subject_number: course.deptCourseId.clone(),
             class_name: course.name.clone(),
             units: section.maxUnits,
@@ -149,7 +135,8 @@ pub fn flatten(
             meet_saturday: meet_days.5,
             meet_sunday: meet_days.6,
             instructors: section.instructors.clone(),
-            prerequisits: section.prerequisites.clone(),
+            // Need to fill this field with other values
+            prerequisits: None,
             notes: section.notes.clone(),
             at: section.location.clone(),
             // we need to calculate the rest of the fields
@@ -267,12 +254,12 @@ pub fn get_term_str(season: &Season, year: u16) -> String {
 
 #[cfg(test)]
 mod tests {
-    use chrono;
-    use std::fs::File;
-    use std::io::{Write, BufReader, BufRead};
-    use crate::json::{Meeting, NestedCourseInfoFull};
+    // use chrono;
+    // use std::fs::File;
+    // use std::io::{Write, BufReader, BufRead};
+    use crate::json::{Meeting,};
     use crate::util::{
-        get_description_fulfillment, get_meeting_days, get_start_end_date, get_start_end_hour, get_time_zone, flatten, read_env_variables
+        get_description_fulfillment, get_meeting_days, get_start_end_date, get_start_end_hour, get_time_zone, read_env_variables
     };
 
     #[test]
