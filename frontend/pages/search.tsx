@@ -44,7 +44,7 @@ type HitProps = {
   year: number;
 };
 const Search = () => {
-  const Hit = ({ hit }) => {
+  const Hit = ({ hit }: any) => {
     return (
       <div className="border">
         <h1 className="text-xl font-bold">
