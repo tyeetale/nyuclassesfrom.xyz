@@ -1,6 +1,12 @@
 import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
-
-import { Hits, InstantSearch, SearchBox, Stats } from "react-instantsearch-dom";
+import "instantsearch.css/themes/satellite-min.css";
+import {
+  Hits,
+  InstantSearch,
+  Pagination,
+  SearchBox,
+  Stats,
+} from "react-instantsearch-dom";
 
 const searchClient = instantMeiliSearch(
   "https://ms-53f05ab45a7a-999.nyc.meilisearch.io",
@@ -43,10 +49,11 @@ type HitProps = {
   units: number;
   year: number;
 };
+
 const Search = () => {
   const Hit = ({ hit }: any) => {
     return (
-      <div className="border">
+      <div className=" py-3">
         <h1 className="text-xl font-bold">
           {hit.class_name} ({hit.term} {hit.year})
         </h1>
@@ -64,12 +71,15 @@ const Search = () => {
   };
 
   return (
-    <div>
-      <h1>NYU Classes From NYU</h1>
+    <div className="container mx-auto p-8 px-10">
+      <h1 className="font-extrabold text-transparent text-2xl bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+        nyuclassesfrom.xyz
+      </h1>
       <InstantSearch indexName="course-fa2022" searchClient={searchClient}>
         <SearchBox />
         <Stats />
         <Hits hitComponent={Hit} />
+        <Pagination showLast={true} />
       </InstantSearch>
     </div>
   );
