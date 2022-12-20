@@ -1,6 +1,9 @@
 import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
 import "instantsearch.css/themes/satellite-min.css";
+import { useRouter } from "next/router";
+import { useState } from "react";
 import {
+  Highlight,
   Hits,
   InstantSearch,
   Pagination,
@@ -51,21 +54,38 @@ type HitProps = {
 };
 
 const Search = () => {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState(router.query.search as string);
   const Hit = ({ hit }: any) => {
     return (
       <div className=" py-3">
         <h1 className="text-xl font-bold">
-          {hit.class_name} ({hit.term} {hit.year})
+          <Highlight attribute="class_name" hit={hit} /> (
+          <Highlight attribute="term" hit={hit} />{" "}
+          <Highlight attribute="year" hit={hit} />)
         </h1>
         <h2 className="text-lg">
-          Class#: {hit.class_number} | School: {hit.school_name} | Units:{" "}
-          {hit.units} | {hit.session_start}
+          #<Highlight attribute="class_number" hit={hit} /> |{" "}
+          <Highlight attribute="school_name" hit={hit} /> | Units:{" "}
+          <Highlight attribute="units" hit={hit} />
+          {hit.session_start ? (
+            <>
+              {" "}
+              | <Highlight attribute="session_start" hit={hit} />
+            </>
+          ) : null}
         </h2>
         <h3 className="text-base">
-          {hit.section} | {hit.instructors[0]} | {hit.grading} |{" "}
-          {hit.instruction_mode} | {hit.course_location} | {hit.component}
+          <Highlight attribute="section" hit={hit} /> |{" "}
+          <Highlight attribute="instructors" hit={hit} /> |{" "}
+          <Highlight attribute="grading" hit={hit} /> |{" "}
+          <Highlight attribute="instruction_mode" hit={hit} /> |{" "}
+          <Highlight attribute="course_location" hit={hit} /> |{" "}
+          <Highlight attribute="component" hit={hit} />
         </h3>
-        <p className="text-sm">{hit.description}</p>
+        <p className="text-sm">
+          <Highlight attribute="description" hit={hit} />
+        </p>
       </div>
     );
   };
@@ -75,6 +95,7 @@ const Search = () => {
       <h1 className="font-extrabold text-transparent text-2xl bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
         nyuclassesfrom.xyz
       </h1>
+
       <InstantSearch indexName="course-fa2022" searchClient={searchClient}>
         <SearchBox />
         <Stats />

@@ -1,10 +1,23 @@
 import { useTheme } from "next-themes";
 import Head from "next/head";
-import { useState } from "react";
+import { useRouter } from "next/router";
+import React, { useMemo, useState } from "react";
 
 export default function Home() {
-  const [search, setSearch] = useState();
+  const [search, setSearch] = useState("");
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setSearch(e.target.value);
+  };
+
+  useMemo(
+    () =>
+      search !== "" &&
+      router.push({ pathname: "/search", query: { search: search } }),
+    [search]
+  );
 
   return (
     <div className="pb-2">
@@ -36,8 +49,9 @@ export default function Home() {
             </svg>
 
             <input
+              onChange={handleChange}
               className="searchbar w-full bg-inherit pl-12 hover:bg-gray-100 border-2 border-gray-200 py-4 px-8 rounded-full"
-              placeholder={search ? "" : "Search…"}
+              placeholder={search === "" ? "Search…" : search}
             />
           </div>
 
