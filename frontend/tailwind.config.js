@@ -19,7 +19,7 @@ module.exports = {
       typography: (theme) => ({
         dark: {
           css: {
-            color: "white",
+            color: "#F5F5F5",
           },
         },
       }),
