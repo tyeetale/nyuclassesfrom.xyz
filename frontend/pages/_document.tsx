@@ -1,5 +1,4 @@
 import NextDocument, { Head, Html, Main, NextScript } from "next/document";
-import React from "react";
 
 type Props = {};
 
@@ -8,7 +7,7 @@ class Document extends NextDocument<Props> {
     return (
       <Html>
         <Head />
-        <body className="dark:bg-gray-800">
+        <body className="dark:bg-darkPurple">
           <Main />
           <NextScript />
         </body>

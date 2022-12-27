@@ -13,6 +13,9 @@ module.exports = {
   theme: {
     typography: (theme) => ({}),
     extend: {
+      colors: {
+        darkPurple: "#070412",
+      },
       typography: (theme) => ({
         dark: {
           css: {
