@@ -61,7 +61,9 @@ export default function Home() {
             ,
             <a href="https://nextjs.org/">
               <img
-                src={"https://cdn.worldvectorlogo.com/logos/next-js.svg"}
+                src={
+                  "https://velog.velcdn.com/images/tjseocld/post/10238718-d9c5-4fb7-a038-e38d221572ed/nextjs.png"
+                }
                 alt="Nextjs"
                 className="pb-1 pt-0.5 object-scale-down h-10 w-10"
               />
@@ -211,7 +213,7 @@ export default function Home() {
 
                   <input
                     onChange={handleChange}
-                    className="searchbar w-full bg-inherit pl-12 hover:bg-gray-100 border-2 border-gray-200 py-4 px-8 rounded-full"
+                    className="searchbar w-full bg-inherit pl-12 hover:bg-gray-100 dark:hover:bg-darkPurple border-2 border-gray-200 py-4 px-8 rounded-full"
                     placeholder={searchQuery === "" ? "Search…" : searchQuery}
                   />
                 </div>

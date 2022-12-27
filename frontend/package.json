@@ -13,6 +13,7 @@
     "@types/node": "18.11.13",
     "@types/react": "18.0.26",
     "@types/react-dom": "18.0.9",
+    "algoliasearch": "^4.14.3",
     "eslint": "8.29.0",
     "eslint-config-next": "13.0.6",
     "next": "13.0.6",
@@ -20,6 +21,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-instantsearch-dom": "^6.38.1",
+    "react-instantsearch-hooks": "^6.38.1",
     "typescript": "4.9.4"
   },
   "devDependencies": {
