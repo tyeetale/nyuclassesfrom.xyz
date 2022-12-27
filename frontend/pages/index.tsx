@@ -142,12 +142,12 @@ export default function Home() {
           #<Highlight attribute="class_number" hit={hit} /> |{" "}
           <Highlight attribute="school_name" hit={hit} /> | Units:{" "}
           <Highlight attribute="units" hit={hit} />
-          {hit.session_start ? (
+          {!!hit.session_start && (
             <>
               {" "}
               | <Highlight attribute="session_start" hit={hit} />
             </>
-          ) : null}
+          )}
         </h2>
         <h3 className="text-base">
           <Highlight attribute="section" hit={hit} /> |{" "}
@@ -157,9 +157,11 @@ export default function Home() {
           <Highlight attribute="course_location" hit={hit} /> |{" "}
           <Highlight attribute="component" hit={hit} />
         </h3>
-        <p className="text-sm">
-          <Highlight attribute="description" hit={hit} />
-        </p>
+        {!!hit.description && (
+          <p className="text-sm">
+            <Highlight attribute="description" hit={hit} />
+          </p>
+        )}
       </div>
     );
   };
@@ -331,8 +333,8 @@ export default function Home() {
                     You can also look for exact phrases and prefix matches.
                   </p>
                   <p>
-                    Filter by specific attributes like @subject:compsci,
-                    @semester:"fall 2022", and @level:{"{graduate}"}
+                    Filter by adding more verbose words like "Fall 2022" or
+                    "Lecture".
                   </p>
                 </div>
 
