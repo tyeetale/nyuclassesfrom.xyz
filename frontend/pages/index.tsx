@@ -348,7 +348,7 @@ export default function Home() {
                 <Stats />
               </div>
             </header>
-            <main className="container mx-auto mb-10">
+            <main className="container mx-auto mb-10 space-y-5">
               <Hits hitComponent={CourseCard} />
               <Pagination showLast={true} />
             </main>

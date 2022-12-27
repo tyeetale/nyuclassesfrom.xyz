@@ -216,7 +216,6 @@
 .ais-VoiceSearch-button,
 .ais-RelevantSort-button {
   appearance: none;
-
   background-image: linear-gradient(-180deg, #fff, #fcfcfd);
   border: 1px solid #d6d6e7;
   border-radius: 3px;
@@ -646,14 +645,15 @@
   font-weight: 400;
   line-height: 1.25rem;
   padding: 1.5rem;
+  border-width: 0.75px;
 }
 .ais-Hits-item:first-of-type,
 .ais-InfiniteHits-item:first-of-type {
-  border-radius: 3px 3px 0 0;
+  border-radius: 15px 15px 0 0;
 }
 .ais-Hits-item:last-of-type,
 .ais-InfiniteHits-item:last-of-type {
-  border-radius: 0 0 3px 3px;
+  border-radius: 0 0 15px 15px;
 }
 .ais-Hits-item:only-of-type,
 .ais-InfiniteHits-item:only-of-type {
