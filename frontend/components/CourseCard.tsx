@@ -91,6 +91,7 @@ const CourseCard = ({ hit }: any) => {
           )}
           {!!hit.start_time && !!hit.end_time && (
             <>
+              {" "}
               | {classDays} @ {formatTime(hit.start_time)}-
               {formatTime(hit.end_time)}
             </>
