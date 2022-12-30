@@ -191,7 +191,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <InstantSearch indexName="course-ja2023" searchClient={searchClient}>
+      <InstantSearch indexName="course" searchClient={searchClient}>
         {searchQuery == "" ? (
           <>
             <main className="min-h-screen flex flex-col justify-center items-center pt-5">
