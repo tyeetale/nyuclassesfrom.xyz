@@ -1,7 +1,11 @@
 {
   "name": "nyuclassesfromxyz",
   "version": "0.1.0",
+  "private": true,
   "description": "The fastest course search for NYU",
+  "engines": {
+    "npm": "please-use-yarn"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
