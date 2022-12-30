@@ -1,4 +1,5 @@
 import { Highlight } from "react-instantsearch-dom";
+import { formatSession } from "./utils/formatSession";
 
 type CourseProps = {
   at: string;
@@ -87,9 +88,9 @@ const CourseCard = ({ hit }: any) => {
           {!!hit.session_start && !!hit.session_end && (
             <>
               {" "}
-              | <Highlight attribute="session_start" hit={hit} />{" "}
-              <Highlight attribute="session_end" hit={hit} /> | {classDays} @{" "}
-              {hit.start_time.slice(0, 5)}-{hit.end_time.slice(0, 5)}
+              | {formatSession(hit.session_start, hit.session_end)} |{" "}
+              {classDays} @ {hit.start_time.slice(0, 5)}-
+              {hit.end_time.slice(0, 5)}
             </>
           )}
         </h2>
@@ -116,12 +117,14 @@ const CourseCard = ({ hit }: any) => {
   else if (isCancelled) {
     return (
       <div className="space-y-1.5">
-        <h1 className="text-xl font-bold">
+        <div className="text-xl font-bold">
           <h1 className="text-red-500 inline">CANCELLED: </h1>
-          <Highlight attribute="class_name" hit={hit} /> (
-          <Highlight attribute="term" hit={hit} />{" "}
-          <Highlight attribute="year" hit={hit} />)
-        </h1>
+          <h1>
+            <Highlight attribute="class_name" hit={hit} /> (
+            <Highlight attribute="term" hit={hit} />{" "}
+            <Highlight attribute="year" hit={hit} />)
+          </h1>{" "}
+        </div>
         <h2 className="text-lg font-semibold">
           #
           <Highlight
