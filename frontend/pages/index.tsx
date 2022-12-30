@@ -99,42 +99,42 @@ export default function Home() {
     process.env.NEXT_PUBLIC_MEILI_KEY
   );
 
-  // type CourseProps = {
-  //   at: string;
-  //   class_name: string;
-  //   class_number: number;
-  //   class_status: string;
-  //   component: string;
-  //   course_location: string;
-  //   description: string;
-  //   end_time: string;
-  //   fulfillment: string;
-  //   grading: string;
-  //   id: number;
-  //   instruction_mode: string;
-  //   instructors: string[];
-  //   meet_friday: boolean;
-  //   meet_monday: boolean;
-  //   meet_saturday: boolean;
-  //   meet_sunday: boolean;
-  //   meet_thursday: boolean;
-  //   meet_tuesday: boolean;
-  //   meet_wednesday: boolean;
-  //   notes: string;
-  //   prerequisite: string;
-  //   school_name: string;
-  //   section: string;
-  //   session_end: string;
-  //   session_start: string;
-  //   start_time: string;
-  //   subject_code: string;
-  //   subject_name: string;
-  //   subject_number: string;
-  //   term: string;
-  //   timezone: string;
-  //   units: number;
-  //   year: number;
-  // };
+  type CourseProps = {
+    at: string;
+    class_name: string;
+    class_number: number;
+    class_status: string;
+    component: string;
+    course_location: string;
+    description: string;
+    end_time: string;
+    fulfillment: string;
+    grading: string;
+    id: number;
+    instruction_mode: string;
+    instructors: string[];
+    meet_friday: boolean;
+    meet_monday: boolean;
+    meet_saturday: boolean;
+    meet_sunday: boolean;
+    meet_thursday: boolean;
+    meet_tuesday: boolean;
+    meet_wednesday: boolean;
+    notes: string;
+    prerequisite: string;
+    school_name: string;
+    section: string;
+    session_end: string;
+    session_start: string;
+    start_time: string;
+    subject_code: string;
+    subject_name: string;
+    subject_number: string;
+    term: string;
+    timezone: string;
+    units: number;
+    year: number;
+  };
 
   const CourseCard = ({ hit }: any) => {
     return (
@@ -160,7 +160,11 @@ export default function Home() {
           <Highlight attribute="instructors" hit={hit} /> |{" "}
           <Highlight attribute="grading" hit={hit} /> |{" "}
           <Highlight attribute="instruction_mode" hit={hit} /> |{" "}
-          <Highlight attribute="course_location" hit={hit} /> |{" "}
+          {!!hit.course_location && (
+            <>
+              <Highlight attribute="course_location" hit={hit} /> |{" "}
+            </>
+          )}
           <Highlight attribute="component" hit={hit} />
         </h3>
         {!!hit.description && (
@@ -187,7 +191,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <InstantSearch indexName="course-fa2022" searchClient={searchClient}>
+      <InstantSearch indexName="course-ja2023" searchClient={searchClient}>
         {searchQuery == "" ? (
           <>
             <main className="min-h-screen flex flex-col justify-center items-center pt-5">
