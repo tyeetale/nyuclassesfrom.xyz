@@ -204,7 +204,7 @@ export default function Home() {
           </>
         ) : (
           <>
-            <header className="sticky top-0 bg-white dark:bg-darkPurple mb-2">
+            <header className="sticky top-0 shadow-md bg-white dark:bg-darkPurple mb-6">
               <div className="container mx-auto py-4 space-y-4 ">
                 <div className="flex justify-between">
                   <h1 className="font-extrabold text-transparent text-3xl bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2">
