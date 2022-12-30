@@ -99,43 +99,6 @@ export default function Home() {
     process.env.NEXT_PUBLIC_MEILI_KEY
   );
 
-  type CourseProps = {
-    at: string;
-    class_name: string;
-    class_number: number;
-    class_status: string;
-    component: string;
-    course_location: string;
-    description: string;
-    end_time: string;
-    fulfillment: string;
-    grading: string;
-    id: number;
-    instruction_mode: string;
-    instructors: string[];
-    meet_friday: boolean;
-    meet_monday: boolean;
-    meet_saturday: boolean;
-    meet_sunday: boolean;
-    meet_thursday: boolean;
-    meet_tuesday: boolean;
-    meet_wednesday: boolean;
-    notes: string;
-    prerequisite: string;
-    school_name: string;
-    section: string;
-    session_end: string;
-    session_start: string;
-    start_time: string;
-    subject_code: string;
-    subject_name: string;
-    subject_number: string;
-    term: string;
-    timezone: string;
-    units: number;
-    year: number;
-  };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setSearchQuery(e.target.value);
   };
