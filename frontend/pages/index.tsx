@@ -276,7 +276,7 @@ export default function Home() {
               </div>
             </header>
             <main className="container mx-auto mb-10 space-y-5">
-              <Hits hitComponent={CourseCard} />
+              <Hits hitComponent={CourseCard as any} />
               <Pagination showLast={true} />
             </main>
             <Footer />
