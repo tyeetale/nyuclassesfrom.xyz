@@ -75,7 +75,7 @@ const CourseCard = ({ hit }: any) => {
           <Highlight attribute="term" hit={hit} />{" "}
           <Highlight attribute="year" hit={hit} />)
         </h1>
-        <h2 className="text-lg font-semibold">
+        <h2 className="text-lg font-semibold text-neutral-700 dark:text-neutral-200">
           #
           <Highlight
             className="underline"
@@ -93,7 +93,7 @@ const CourseCard = ({ hit }: any) => {
             </>
           )}
         </h2>
-        <h3 className="text-base font-medium">
+        <h3 className="text-base font-medium text-neutral-600 dark:text-neutral-300">
           {"Section "} <Highlight attribute="section" hit={hit} /> |{" "}
           <Highlight attribute="instructors" hit={hit} /> |{" "}
           <Highlight attribute="grading" hit={hit} /> |{" "}
@@ -107,7 +107,7 @@ const CourseCard = ({ hit }: any) => {
           <Highlight attribute="component" hit={hit} />
         </h3>
         {!!hit.description && (
-          <p className="text-sm">
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
             <Highlight attribute="description" hit={hit} />
           </p>
         )}
