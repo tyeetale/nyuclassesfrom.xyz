@@ -1,5 +1,6 @@
 import { Highlight } from "react-instantsearch-dom";
 import { formatSession } from "./utils/formatSession";
+import { formatTime } from "./utils/formatTime";
 
 type CourseProps = {
   at: string;
@@ -86,11 +87,12 @@ const CourseCard = ({ hit }: any) => {
           | <Highlight attribute="school_name" hit={hit} /> | Units:{" "}
           <Highlight attribute="units" hit={hit} />
           {!!hit.session_start && !!hit.session_end && (
+            <> | {formatSession(hit.session_start, hit.session_end)}</>
+          )}
+          {!!hit.start_time && !!hit.end_time && (
             <>
-              {" "}
-              | {formatSession(hit.session_start, hit.session_end)} |{" "}
-              {classDays} @ {hit.start_time.slice(0, 5)}-
-              {hit.end_time.slice(0, 5)}
+              | {classDays} @ {formatTime(hit.start_time)}-
+              {formatTime(hit.end_time)}
             </>
           )}
         </h2>
