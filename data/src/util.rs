@@ -6,6 +6,7 @@ use dotenv;
 use reqwest::Url;
 use std::cmp;
 use std::env;
+use std::str::FromStr;
 
 pub struct UrlBuilder {}
 
@@ -18,6 +19,9 @@ pub enum Season {
     Fall,
 }
 
+#[derive(Debug)]
+pub struct ParseErr;
+
 impl ToString for Season {
     fn to_string(&self) -> String {
         match self {
@@ -25,6 +29,19 @@ impl ToString for Season {
             Self::Spring => String::from("Spring"),
             Self::Summer => String::from("Summer"),
             Self::Fall => String::from("Fall"),
+        }
+    }
+}
+
+impl FromStr for Season {
+    type Err = ParseErr;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "january" => Ok(Self::January),
+            "spring" => Ok(Self::Spring),
+            "summer" => Ok(Self::Summer),
+            "fall" => Ok(Self::Fall),
+            _ => Err(ParseErr),
         }
     }
 }
@@ -45,7 +62,7 @@ impl UrlBuilder {
     ) -> Result<Url, Error> {
         let url = format!(
             "https://nyu.a1liu.com/api/courses/{}/{}",
-            get_term_str(term, year),
+            format!("{}{}", term.get_short_name(), year),
             subject
         );
         match Url::parse(&*url) {
@@ -56,7 +73,7 @@ impl UrlBuilder {
 }
 
 impl Season {
-    fn get_short_name(&self) -> String {
+    pub fn get_short_name(&self) -> String {
         let res = match self {
             Season::January => "ja",
             Season::Spring => "sp",
@@ -308,10 +325,6 @@ pub fn read_env_variables() -> (String, String) {
         env::var("DB_URL").expect("URL not found"),
         env::var("DB_KEY").expect("Key not found"),
     )
-}
-
-pub fn get_term_str(season: &Season, year: u16) -> String {
-    format!("{}{}", season.get_short_name(), year)
 }
 
 #[cfg(test)]

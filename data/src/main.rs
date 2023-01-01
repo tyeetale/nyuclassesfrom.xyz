@@ -4,7 +4,7 @@ mod json;
 mod types;
 mod util;
 
-use std::collections::HashMap;
+use std::{collections::HashMap,};
 
 use database::*;
 use fetch::*;
@@ -14,18 +14,23 @@ use util::*;
 
 #[tokio::main]
 async fn main() {
-    // We first fetch school and subject info
-    let term = Season::Spring;
-    let year = 2023;
+    println!("Enter year");
+    let mut year_str = String::new();
+    std::io::stdin().read_line(&mut year_str).unwrap();
+    println!("Enter term (january, spring, summer, fall)");
+    let mut term_str = String::new();
+    std::io::stdin().read_line(&mut term_str).unwrap();
 
-    let term_code = get_term_str(&term, year);
-    let mut index = String::from("course-");
-    index.push_str(&term_code);
-
+    let year = year_str.trim_end().parse::<u16>().expect("Entered invalid year");
+    let term = term_str.trim_end().parse::<Season>().expect("Entered invalid season");
+    let term_code = format!("{}{}", term.get_short_name(), year);
     let schools = fetch_schools(&term_code)
         .await
         .expect("Fetch school failed");
     println!("Metadata collected");
+
+    // Define database index
+    let index = String::from("course");
 
     let mut school_ctr = 1;
     let mut class_ctr = 0;

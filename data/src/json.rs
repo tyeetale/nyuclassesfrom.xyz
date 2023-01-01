@@ -2,12 +2,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FlatCourseInfo {
-    // Unique ID used as the primary key
     pub id: u32,
     pub school_name: String,
-    // no such field can be found
     pub subject_name: String,
-    // We only keep the subject code for simplicity
     pub subject_code: String,
     pub subject_number: String,
     pub class_name: String,
@@ -20,7 +17,6 @@ pub struct FlatCourseInfo {
     pub course_location: Option<String>,
     pub session_start: String,
     pub session_end: String,
-    // Do we need this field at the moment?
     pub class_status: String,
     pub instruction_mode: Option<String>,
     pub component: String,
@@ -31,7 +27,6 @@ pub struct FlatCourseInfo {
     pub meet_friday: bool,
     pub meet_saturday: bool,
     pub meet_sunday: bool,
-    // 24 hrs
     pub start_time: String,
     pub end_time: String,
     pub at: Option<String>,
