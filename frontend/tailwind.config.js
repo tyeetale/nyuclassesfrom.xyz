@@ -1,15 +1,10 @@
 module.exports = {
   darkMode: "class",
-  content: {
-    enabled: true,
-    content: [
-      "./pages/**/*.{js,ts,jsx,tsx}",
-      "./components/**/*.{js,ts,jsx,tsx}",
-    ],
-    options: {
-      safeList: ["dark"],
-    },
-  },
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+  ],
+  safeList: ["dark"],
   theme: {
     typography: (theme) => ({}),
     extend: {

@@ -16,10 +16,10 @@ export default function Home() {
   const { theme, setTheme } = useTheme();
 
   const Footer = () => (
-    <footer className="container max-w-full border-t">
-      <div className="flex justify-center items-center border-slate-200 ">
-        <div className="mt-10 m-auto">
-          <p className="text-center">
+    <footer className="w-full md:w-auto border-t">
+      <div className="flex justify-center items-center border-slate-200 w-full">
+        <div className="mt-10 scale-90 lg:scale-100">
+          <p className="text-center text-gray-600">
             Made with ♥ by{" "}
             <a
               href="https://github.com/tyeetale"
@@ -118,38 +118,39 @@ export default function Home() {
         {searchQuery == "" ? (
           <>
             <main className="min-h-screen flex flex-col justify-center items-center pt-5">
-              <div className="m-auto">
-                <h1 className="text-center p-1 font-extrabold text-transparent text-6xl bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 ">
+              <div className="md:w-10/12 lg:w-6/12">
+                <h1 className="text-center font-extrabold text-transparent xl:text-5xl lg:text-4xl md:text-3xl text-2xl -my-4 bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
                   nyuclassesfrom.xyz
                 </h1>
-                <div className="flex flex-nowrap items-center my-8 relative">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-6 h-6 absolute z-10 ml-4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                <div className="scale-90 lg:scale-100">
+                  <div className="flex flex-nowrap items-center my-5 md:my-8 lg:my-12 elative">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-6 h-6 absolute z-10 ml-4"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                      />
+                    </svg>
+
+                    <input
+                      onChange={handleChange}
+                      className="searchbar w-full bg-inherit pl-12 hover:bg-gray-100 dark:hover:bg-darkPurple border-2 border-gray-200 py-4 px-8 rounded-full"
+                      placeholder={searchQuery === "" ? "Search…" : searchQuery}
                     />
-                  </svg>
-
-                  <input
-                    onChange={handleChange}
-                    className="searchbar w-full bg-inherit pl-12 hover:bg-gray-100 dark:hover:bg-darkPurple border-2 border-gray-200 py-4 px-8 rounded-full"
-                    placeholder={searchQuery === "" ? "Search…" : searchQuery}
-                  />
+                  </div>
+                  <p className="text-center text-gray-500">
+                    try words, phrases, titles, subjects, schools, course
+                    numbers, instructor names, grading, components, and more.
+                    You can also look for exact phrases and prefix matches.
+                  </p>
                 </div>
-
-                <p className="p-1  text-center text-transparent text-xl bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
-                  try words, phrases, titles, subjects, schools, course numbers,
-                  <br /> instructor names, grading, components, and more. <br />
-                  You can also look for exact phrases and prefix matches.
-                </p>
 
                 <div className="flex flex-nowrap justify-center mt-4 space-x-4">
                   {/* <a
@@ -204,14 +205,16 @@ export default function Home() {
           </>
         ) : (
           <>
-            <header className="sticky top-0 shadow-md bg-white dark:bg-darkPurple mb-6">
-              <div className="container mx-auto py-4 space-y-4 ">
-                <div className="flex justify-between">
-                  <h1 className="font-extrabold text-transparent text-3xl bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2">
-                    nyuclassesfrom.xyz
-                  </h1>
-                  <div className="flex space-x-4">
-                    {/* <a
+            <div className="mx-6 lg:w-full">
+              <header className="md:sticky top-0  bg-white dark:bg-darkPurple mb-6">
+                <div className="container mx-auto py-4 space-y-4 ">
+                  <div className="flex justify-between items-center">
+                    <h1 className=" font-extrabold text-transparent text-2xl lg:text-3xl bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+                      nyuclassesfrom.xyz
+                    </h1>
+
+                    <div className="flex space-x-4">
+                      {/* <a
                       href="https://github.com/tyeetale/nyuclassesfrom.xyz"
                       className="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300"
                     >
@@ -227,58 +230,61 @@ export default function Home() {
                         <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
                       </svg>
                     </a> */}
-                    <button
-                      onClick={() =>
-                        setTheme(theme === "dark" ? "light" : "dark")
-                      }
-                      className="text-slate-400 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none ring-2 ring-slate-200 dark:ring-slate-700 rounded-lg text-sm px-2.5"
-                    >
-                      {theme === "dark" ? (
-                        <svg
-                          className="w-5 h-5"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                            fillRule="evenodd"
-                            clipRule="evenodd"
-                          ></path>
-                        </svg>
-                      ) : (
-                        <svg
-                          className="w-5 h-5"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-                        </svg>
-                      )}
-                    </button>
+                      <button
+                        onClick={() =>
+                          setTheme(theme === "dark" ? "light" : "dark")
+                        }
+                        className="text-slate-400 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none ring-2 ring-slate-200 dark:ring-slate-700 rounded-lg text-sm w-10 h-10 px-2.5"
+                      >
+                        {theme === "dark" ? (
+                          <svg
+                            className="w-5 h-5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                            ></path>
+                          </svg>
+                        ) : (
+                          <svg
+                            className="w-5 h-5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div className="text-md space-y-2">
-                  <p>
-                    Try words, phrases, titles, subjects, schools, course
-                    numbers, instructor names, grading, components, and more.
-                    You can also look for exact phrases and prefix matches.
-                  </p>
-                  <p>
-                    Filter by adding more verbose words like "Fall 2022" or
-                    "Lecture".
-                  </p>
-                </div>
+                  <div className="text-md space-y-2">
+                    <p>
+                      Try words, phrases, titles, subjects, schools, course
+                      numbers, instructor names, grading, components, and more.
+                      You can also look for exact phrases and prefix matches.
+                    </p>
+                    <p>
+                      Filter by adding more verbose words like "Fall 2022" or
+                      "Lecture".
+                    </p>
+                  </div>
 
-                <SearchBox autoFocus defaultRefinement={searchQuery} />
-                <Stats />
-              </div>
-            </header>
-            <main className="container mx-auto mb-10 space-y-5">
-              <Hits hitComponent={CourseCard as any} />
-              <Pagination showLast={true} />
-            </main>
+                  <SearchBox autoFocus defaultRefinement={searchQuery} />
+                  <Stats />
+                </div>
+              </header>
+              <main className="container mx-auto mb-10 space-y-5">
+                <Hits hitComponent={CourseCard as any} />
+                <div className="flex justify-center">
+                  <Pagination showLast={true} />
+                </div>
+              </main>
+            </div>
             <Footer />
           </>
         )}

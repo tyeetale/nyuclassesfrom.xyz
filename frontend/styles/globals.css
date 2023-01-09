@@ -289,8 +289,6 @@
 .ais-GeoSearch-reset:active,
 .ais-VoiceSearch-button:active {
   border-color: #d6d6e7;
-  box-shadow: rgba(119, 122, 175, 0.4) 0 1px 4px 0 inset,
-    rgba(119, 122, 175, 0.4) 0 1px 1px 0 inset, rgba(35, 38, 59, 0.05) 0 1px 0 0;
 }
 .ais-ClearRefinements-button:disabled[disabled],
 .ais-InfiniteHits-loadMore:disabled[disabled],
