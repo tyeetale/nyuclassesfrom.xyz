@@ -6,6 +6,49 @@ export default class MyDocument extends Document {
     return (
       <Html>
         <Head>
+          {/* <!-- HTML Meta Tags --> */}
+          <title>NYUClassesFromXYZ</title>
+          <meta
+            name="description"
+            content="an NYU search that won't take 2 hours"
+          />
+
+          {/* <!-- Facebook Meta Tags --> */}
+          <meta
+            property="og:url"
+            content="https://nyuclassesfrom-xyz.vercel.app"
+          />
+          <meta property="og:type" content="website" />
+          <meta property="og:title" content="NYUClassesFromXYZ" />
+          <meta
+            property="og:description"
+            content="an NYU search that won't take 2 hours"
+          />
+          <meta
+            property="og:image"
+            content="https://nyuclassesfrom-xyz.vercel.app/social-image.png"
+          />
+
+          {/* <!-- Twitter Meta Tags --> */}
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta
+            property="twitter:domain"
+            content="nyuclassesfrom-xyz.vercel.app"
+          />
+          <meta
+            property="twitter:url"
+            content="https://nyuclassesfrom-xyz.vercel.app"
+          />
+          <meta name="twitter:title" content="NYUClassesFromXYZ" />
+          <meta
+            name="twitter:description"
+            content="an NYU search that won't take 2 hours"
+          />
+          <meta
+            name="twitter:image"
+            content="https://nyuclassesfrom-xyz.vercel.app/social-image.png"
+          />
+
           {/* Global Site Tag (gtag.js) - Google Analytics */}
           <script
             async
